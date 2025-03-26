@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Evoluzn Sewing Machine</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="aquarelle_sewing_machine_dashboard">AQUARELLE SEWING MACHINE DASHBOARD</string>
+    <string name="production_time">PRODUCTION TIME</string>
+    <string name="production_count">PRODUCTION COUNT</string>
+    <string name="TEMPERATURE">Temperature</string>
+    <string name="VIBRATION">Vibration</string>
+    <string name="temperature">TEMPERATURE</string>
+    <string name="vibration">VIBRATION</string>
+    <string name="oil_level">OIL LEVEL</string>
+    <string name="bobbin_thread_level_value">BOBBIN THREAD LEVEL </string>
+    <string name="powered_by">Powered by</string>
+    <string name="evoluzn">Evoluzn</string>
+    <string name="stitch_count">Stitch Count</string>
+    <string name="todo">TODO</string>
+    <string name="thread_consumption">Thread Consumption</string>
+    <string name="sec">sec</string>
+    <string name="percent">%</string>
+    <string name="inch_min">inch/min</string>
+    <string name="reset">Reset</string>
+    <string name="stitch_inch">stitch/inch</string>
+    <string name="inch">inch</string>
+
+</resources>

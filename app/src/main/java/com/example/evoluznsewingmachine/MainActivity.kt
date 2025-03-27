@@ -41,7 +41,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var resetBtn:AppCompatButton
     private lateinit var fileSavedBtn:ImageButton
 
-    lateinit var resetService:ResetService
 
     lateinit var dbHelper:DbHelper
     private val usbDataViewModel: UsbDataViewModel by viewModels()
@@ -73,8 +72,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        resetService=ResetService()
-        resetService.scheduleDailyReset(this)
+
+
 
         time=findViewById(R.id.time)
         pushBackCount=findViewById(R.id.count)
@@ -140,13 +139,12 @@ class MainActivity : AppCompatActivity() {
         })
 
         resetBtn.setOnClickListener {
-            // SharedPreferences me reset time save karo
-            val sharedPref = getSharedPreferences("MachinePrefs", Context.MODE_PRIVATE)
-            val editor = sharedPref.edit()
-            editor.putString("resetTime", SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date()))
-            editor.apply()
+            val dbHelper = DbHelper(this)
 
-            // UI Reset karo
+            // Mark the last row as reset and insert a new zeroed row
+            dbHelper.resetMachineData()
+
+            // Update UI to reflect reset
             time.text = "0"
             pushBackCount.text = "0"
             temperature.text = "0"
@@ -156,7 +154,7 @@ class MainActivity : AppCompatActivity() {
             stitchCount.text = "0"
             threadConsumption.text = "0"
 
-            // 3 Second Delay ke baad Data Refresh Karo
+            // Refresh data after 3 seconds
             Handler(Looper.getMainLooper()).postDelayed({
                 usbDataViewModel.productionTime
                 usbDataViewModel.productionCount
@@ -166,9 +164,9 @@ class MainActivity : AppCompatActivity() {
                 usbDataViewModel.threadPercent
                 usbDataViewModel.stitchCount
                 usbDataViewModel.threadConsumption
-
             }, 3000)
         }
+
 
 
 

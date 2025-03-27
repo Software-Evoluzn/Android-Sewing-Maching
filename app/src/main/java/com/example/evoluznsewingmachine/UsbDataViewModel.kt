@@ -13,5 +13,4 @@ class UsbDataViewModel : ViewModel() {
     val stitchCount: LiveData<String> = UsbDataRepository.stitchCount
     val threadConsumption: LiveData<String> = UsbDataRepository.threadConsumption
 
-
 }

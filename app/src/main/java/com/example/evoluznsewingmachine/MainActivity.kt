@@ -1,6 +1,7 @@
 package com.example.evoluznsewingmachine
 
 
+import android.app.DatePickerDialog
 import android.content.BroadcastReceiver
 import android.content.ContentValues
 import android.content.Context
@@ -12,6 +13,7 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
@@ -21,9 +23,12 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.Observer
+import com.google.android.material.datepicker.MaterialDatePicker
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -40,6 +45,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var threadConsumption:TextView
     lateinit var resetBtn:AppCompatButton
     private lateinit var fileSavedBtn:ImageButton
+    lateinit var setDate:AppCompatButton
+    lateinit var startDate: String
+    lateinit var endDate: String
 
 
     lateinit var dbHelper:DbHelper
@@ -85,11 +93,38 @@ class MainActivity : AppCompatActivity() {
         threadConsumption=findViewById(R.id.threadConsumptionValue)
         resetBtn=findViewById(R.id.resetBtn)
         fileSavedBtn=findViewById(R.id.dbFileSave)
+        setDate=findViewById(R.id.setDate)
         dbHelper=DbHelper(this)
 
         fileSavedBtn.setOnClickListener {
             saveDatabaseToDownloads()
         }
+
+        setDate.setOnClickListener {
+            val popupMenu = PopupMenu(this, setDate)
+            popupMenu.menu.add("Today")
+            popupMenu.menu.add("Set Range")
+
+            popupMenu.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.title) {
+                    "Today" -> {
+                        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                        Log.d("DateCheck", "Today's Date: $today") // Debugging Log
+                        setDate.text = today
+
+                    }
+                    "Set Range" -> {
+                        showDateRangePicker { start, end ->
+                            setDate.text = " $start  to  $end "
+                            dbHelper.getMachineDataByDateRange(start,end)
+                        }
+                    }
+                }
+                true
+            }
+            popupMenu.show()
+        }
+
 
 
 
@@ -175,6 +210,21 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    private fun showDateRangePicker(onRangeSelected: (String, String) -> Unit) {
+        val dateRangePicker =
+            MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select Date Range").build()
+
+        dateRangePicker.addOnPositiveButtonClickListener { selection ->
+            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            startDate = sdf.format(Date(selection.first!!))
+            endDate = sdf.format(Date(selection.second!!))
+            onRangeSelected(startDate, endDate) // Return start and end dates separately
+        }
+
+        dateRangePicker.show(supportFragmentManager, "DATE_PICKER")
+    }
+
+
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(usbDisconnectReceiver)
@@ -202,10 +252,10 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun saveDatabaseToDownloads() {
-        val databasePath = getDatabasePath("MachineData.db").absolutePath
+        val databasePath = getDatabasePath("Machine_Sewing.db").absolutePath
         val resolver = contentResolver
         val contentValues = ContentValues().apply {
-            put(MediaStore.Downloads.DISPLAY_NAME, "MachineData.db")
+            put(MediaStore.Downloads.DISPLAY_NAME, "Machine_Sewing.db")
             put(MediaStore.Downloads.MIME_TYPE, "application/x-sqlite3")
             put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
         }

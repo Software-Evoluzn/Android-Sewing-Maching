@@ -107,10 +107,10 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             COALESCE(SUM($COL_PUSH_BACK_COUNT), 0),
             COALESCE(SUM($COL_STITCH_COUNT), 0),
 
-            -- Latest Sensor Readings
-            (SELECT $COL_TEMPERATURE FROM $TABLE_NAME WHERE $COL_DATE_AND_TIME = (SELECT MAX($COL_DATE_AND_TIME) FROM $TABLE_NAME)),
-            (SELECT $COL_VIBRATION FROM $TABLE_NAME WHERE $COL_DATE_AND_TIME = (SELECT MAX($COL_DATE_AND_TIME) FROM $TABLE_NAME)),
-            (SELECT $COL_OIL_LEVEL FROM $TABLE_NAME WHERE $COL_DATE_AND_TIME = (SELECT MAX($COL_DATE_AND_TIME) FROM $TABLE_NAME)),
+           -- Average Sensor Readings After Reset
+           (SELECT ROUND(AVG($COL_TEMPERATURE), 2) FROM $TABLE_NAME WHERE $COL_DATE_AND_TIME > (SELECT lastResetTime FROM LastReset)),
+           (SELECT ROUND(AVG($COL_VIBRATION), 2) FROM $TABLE_NAME WHERE $COL_DATE_AND_TIME > (SELECT lastResetTime FROM LastReset)),
+           (SELECT ROUND(AVG($COL_OIL_LEVEL), 2) FROM $TABLE_NAME WHERE $COL_DATE_AND_TIME > (SELECT lastResetTime FROM LastReset)),
 
             -- Total Thread Length in cm
             (SELECT ROUND(SUM($COL_THREAD_PERCENT) * 2.54, 2) FROM $TABLE_NAME WHERE $COL_DATE_AND_TIME > (SELECT lastResetTime FROM LastReset)),
@@ -126,6 +126,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         FROM $TABLE_NAME 
         WHERE $COL_DATE_AND_TIME > (SELECT lastResetTime FROM LastReset)
+        AND DATE($COL_DATE_AND_TIME) = DATE('now')
     """.trimIndent()
 
         try {
@@ -186,6 +187,72 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             db.close()
         }
     }
+
+
+    fun getMachineDataByDateRange(startDate: String, endDate: String): MachineData? {
+        val db = readableDatabase
+        var cursor: Cursor? = null
+        var machineData: MachineData? = null
+
+
+        val query = """
+    WITH FilteredData AS (
+        SELECT *
+        FROM $TABLE_NAME
+        WHERE DATE($COL_DATE_AND_TIME) BETWEEN ? AND ?
+    )
+    SELECT
+        -- Summing required columns
+        COALESCE(SUM($COL_TIME), 0),
+        COALESCE(SUM($COL_PUSH_BACK_COUNT), 0),
+        COALESCE(SUM($COL_STITCH_COUNT), 0),
+
+        -- Average sensor readings
+        ROUND(AVG($COL_TEMPERATURE), 2),
+        ROUND(AVG($COL_VIBRATION), 2),
+        ROUND(AVG($COL_OIL_LEVEL), 2),
+
+        -- Total Thread Length in cm
+        ROUND(SUM($COL_THREAD_PERCENT) * 2.54, 2),
+
+        -- Stitch Count Per cm
+        CASE 
+            WHEN SUM($COL_THREAD_PERCENT) > 0 
+            THEN ROUND(CAST(SUM($COL_STITCH_COUNT) AS FLOAT) / SUM($COL_THREAD_PERCENT), 2) 
+            ELSE 0 
+        END
+         FROM FilteredData
+""".trimIndent()
+
+
+        try {
+            cursor = db.rawQuery(query, arrayOf(startDate, endDate))
+
+            if (cursor.moveToFirst()) {
+                machineData = MachineData(
+                    cursor.getInt(0),
+                    cursor.getInt(1),
+                    cursor.getInt(2),
+                    cursor.getString(3) ?: "N/A",
+                    cursor.getString(4) ?: "N/A",
+                    cursor.getString(5) ?: "N/A",
+                    cursor.getFloat(6),
+                    cursor.getInt(7)
+                )
+
+
+            }
+
+        } catch (e: Exception) {
+            Log.e("DbHelper", "Error fetching machine data: ${e.message}")
+        } finally {
+            cursor?.close()
+            db.close()
+        }
+
+        return machineData
+    }
+
 
 }
 

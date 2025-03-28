@@ -51,26 +51,39 @@
 
            android:paddingBottom="10dp">
 
-            <TextView
-                android:id="@+id/time"
+            <LinearLayout
+                android:id="@+id/productionTimeLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_marginTop="40dp"
-                android:text=""
-                android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="@string/sec"
-                android:textSize="15sp"
-                app:layout_constraintBottom_toBottomOf="@+id/time"
-                app:layout_constraintStart_toEndOf="@+id/time"
-                app:layout_constraintTop_toTopOf="@+id/time" />
+                <TextView
+                    android:id="@+id/time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text=""
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/sec"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/time"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/time"
+                    app:layout_constraintTop_toTopOf="@+id/time" />
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -78,9 +91,9 @@
                 android:layout_marginTop="10dp"
                 android:text="@string/production_time"
                 android:textSize="10sp"
-                app:layout_constraintEnd_toEndOf="@+id/time"
-                app:layout_constraintStart_toStartOf="@+id/time"
-                app:layout_constraintTop_toBottomOf="@+id/time" />
+                app:layout_constraintEnd_toEndOf="@+id/productionTimeLayout"
+                app:layout_constraintStart_toStartOf="@+id/productionTimeLayout"
+                app:layout_constraintTop_toBottomOf="@+id/productionTimeLayout" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -101,26 +114,39 @@
             android:layout_height="match_parent"
             android:background="@drawable/card_background">
 
-            <TextView
-                android:id="@+id/count"
+            <LinearLayout
+                android:id="@+id/productionCountLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:layout_marginTop="40dp"
-                android:text=""
-                android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="count"
-                android:textSize="15sp"
-                app:layout_constraintBottom_toBottomOf="@+id/count"
-                app:layout_constraintStart_toEndOf="@+id/count"
-                app:layout_constraintTop_toTopOf="@+id/count" />
+                <TextView
+                    android:id="@+id/count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text=""
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="count"
+                    android:textSize="15sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/count"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/count"
+                    app:layout_constraintTop_toTopOf="@+id/count" />
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -128,9 +154,9 @@
                 android:layout_marginTop="10dp"
                 android:textSize="10sp"
                 android:text="@string/production_count"
-                app:layout_constraintEnd_toEndOf="@+id/count"
-                app:layout_constraintStart_toStartOf="@+id/count"
-                app:layout_constraintTop_toBottomOf="@+id/count" />
+                app:layout_constraintEnd_toEndOf="@+id/productionCountLayout"
+                app:layout_constraintStart_toStartOf="@+id/productionCountLayout"
+                app:layout_constraintTop_toBottomOf="@+id/productionCountLayout" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

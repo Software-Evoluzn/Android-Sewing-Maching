@@ -235,6 +235,7 @@ class UsbService:Service() {
                     // Fetch updated machine data in IO thread
                     val updatedMachineData = dbHelper.getMachineData()
 
+
                     // Switch to Main thread to update UI
                    withContext(Dispatchers.Main) {
                        updatedMachineData?.let {

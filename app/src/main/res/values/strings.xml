@@ -25,5 +25,8 @@
     <string name="stitch_inch">stitch/inch</string>
     <string name="inch">inch</string>
     <string name="set_date">SET DATE</string>
+    <string name="showing_historic_data">Showing Historic Data</string>
+    <string name="apply">Apply</string>
+    <string name="stitch_count_per_inch">STITCH COUNT PER INCH</string>
 
 </resources>

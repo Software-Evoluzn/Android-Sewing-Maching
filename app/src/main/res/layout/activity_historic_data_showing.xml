@@ -3,11 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".MainActivity">
+    tools:context=".HistoricDataShowing">
 
+    <ImageButton
+        android:id="@+id/backBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@android:color/transparent"
+        android:src="@drawable/go_back"
+        app:layout_constraintStart_toStartOf="@+id/cardView2"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <TextView
         android:id="@+id/textView2"
@@ -15,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:fontFamily="@font/lato_bold"
-        android:text="@string/aquarelle_sewing_machine_dashboard"
+        android:text="SHOWING HISTORIC DATA "
         android:textColor="#2C2C2C"
         android:textSize="20sp"
 
@@ -31,10 +40,10 @@
         android:layout_height="wrap_content"
 
         android:layout_marginStart="70dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         app:cardCornerRadius="10dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dbFileSave">
+        app:layout_constraintTop_toBottomOf="@+id/setDate">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -59,7 +68,7 @@
                     android:id="@+id/time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=""
+                    android:text="0"
                     android:textColor="#2B3674"
                     android:textSize="22sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -130,7 +139,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="#2B3674"
                     android:fontFamily="@font/lato"
-                    android:text=""
+                    android:text="0"
                     android:textSize="22sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -202,7 +211,7 @@
                     android:layout_height="wrap_content"
 
                     android:fontFamily="@font/lato"
-                    android:text=""
+                    android:text="0.00"
                     android:textColor="#2B3674"
                     android:textSize="22sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -274,7 +283,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/lato"
-                    android:text=""
+                    android:text="0.00"
                     android:textColor="#2B3674"
                     android:textSize="22sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -346,7 +355,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/lato"
-                    android:text=""
+                    android:text="0.00"
                     android:textColor="#2B3674"
                     android:textSize="22sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -420,7 +429,7 @@
                     android:layout_height="wrap_content"
 
                     android:fontFamily="@font/lato"
-                    android:text=""
+                    android:text="0.00"
                     android:textColor="#2B3674"
                     android:textSize="22sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -494,7 +503,7 @@
                     android:layout_height="wrap_content"
 
                     android:fontFamily="@font/lato"
-                    android:text=""
+                    android:text="0"
                     android:textColor="#2B3674"
                     android:textSize="22sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -536,14 +545,13 @@
     </androidx.cardview.widget.CardView>
 
     <LinearLayout
-        android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLayout">
+        app:layout_constraintTop_toBottomOf="@+id/applyBtn">
 
         <TextView
             android:id="@+id/textView"
@@ -571,19 +579,18 @@
     </LinearLayout>
 
 
-    <ImageButton
-        android:id="@+id/dbFileSave"
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/setDate"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_marginTop="20dp"
-
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/todo"
+        android:background="@drawable/set_date_bg"
+        android:text="@string/set_date"
+        android:textColor=" #2B3674"
         app:layout_constraintEnd_toEndOf="@+id/stitchCount"
-        app:layout_constraintTop_toBottomOf="@+id/textView2"
-        app:srcCompat="@drawable/download_arrow" />
-
-
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/threadConsumption"
@@ -619,7 +626,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/lato"
-                    android:text=""
+                    android:text="0"
                     android:textColor="#2B3674"
                     android:textSize="22sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -661,43 +668,19 @@
 
     </androidx.cardview.widget.CardView>
 
-    <LinearLayout
-        android:id="@+id/btnLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal"
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/applyBtn"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/reset_btn_bg"
+        android:text="@string/apply"
+        android:textColor="@color/white"
+        android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bobinThreadLevel">
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/resetBtn"
-            android:layout_width="100dp"
-            android:layout_height="40dp"
-            android:layout_margin="10dp"
-            android:background="@drawable/reset_btn_bg"
-            android:text="@string/reset"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:layout_editor_absoluteY="399dp" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/nextBtn"
-            android:layout_width="100dp"
-            android:layout_height="40dp"
-            android:layout_margin="10dp"
-            android:background="@drawable/reset_btn_bg"
-            android:text="next"
-            android:textColor="@color/white"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintStart_toEndOf="@+id/resetBtn"
-            app:layout_constraintTop_toTopOf="@+id/resetBtn" />
-
-    </LinearLayout>
-
+        app:layout_constraintTop_toBottomOf="@+id/bobinThreadLevel" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -107,10 +107,18 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             COALESCE(SUM($COL_PUSH_BACK_COUNT), 0),
             COALESCE(SUM($COL_STITCH_COUNT), 0),
 
-           -- Average Sensor Readings After Reset
-           (SELECT ROUND(AVG($COL_TEMPERATURE), 2) FROM $TABLE_NAME WHERE $COL_DATE_AND_TIME > (SELECT lastResetTime FROM LastReset)),
-           (SELECT ROUND(AVG($COL_VIBRATION), 2) FROM $TABLE_NAME WHERE $COL_DATE_AND_TIME > (SELECT lastResetTime FROM LastReset)),
-           (SELECT ROUND(AVG($COL_OIL_LEVEL), 2) FROM $TABLE_NAME WHERE $COL_DATE_AND_TIME > (SELECT lastResetTime FROM LastReset)),
+           -- Latest Sensor Readings After Reset
+        (SELECT $COL_TEMPERATURE FROM $TABLE_NAME 
+         WHERE $COL_DATE_AND_TIME > (SELECT lastResetTime FROM LastReset) 
+         ORDER BY $COL_DATE_AND_TIME DESC LIMIT 1),
+         
+        (SELECT $COL_VIBRATION FROM $TABLE_NAME 
+         WHERE $COL_DATE_AND_TIME > (SELECT lastResetTime FROM LastReset) 
+         ORDER BY $COL_DATE_AND_TIME DESC LIMIT 1),
+
+        (SELECT $COL_OIL_LEVEL FROM $TABLE_NAME 
+         WHERE $COL_DATE_AND_TIME > (SELECT lastResetTime FROM LastReset) 
+         ORDER BY $COL_DATE_AND_TIME DESC LIMIT 1),
 
             -- Total Thread Length in cm
             (SELECT ROUND(SUM($COL_THREAD_PERCENT) * 2.54, 2) FROM $TABLE_NAME WHERE $COL_DATE_AND_TIME > (SELECT lastResetTime FROM LastReset)),
@@ -252,6 +260,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         return machineData
     }
+
+
 
 
 }

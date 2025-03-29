@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 
 object UsbDataRepository {
+
+
     private val _productionTime = MutableLiveData<String>()
     val productionTime: LiveData<String> get() = _productionTime
 

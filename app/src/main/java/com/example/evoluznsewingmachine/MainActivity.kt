@@ -45,9 +45,10 @@ class MainActivity : AppCompatActivity() {
     lateinit var threadConsumption:TextView
     lateinit var resetBtn:AppCompatButton
     private lateinit var fileSavedBtn:ImageButton
-    lateinit var setDate:AppCompatButton
+
     lateinit var startDate: String
     lateinit var endDate: String
+    lateinit var nextBtn:AppCompatButton
 
 
     lateinit var dbHelper:DbHelper
@@ -93,39 +94,19 @@ class MainActivity : AppCompatActivity() {
         threadConsumption=findViewById(R.id.threadConsumptionValue)
         resetBtn=findViewById(R.id.resetBtn)
         fileSavedBtn=findViewById(R.id.dbFileSave)
-        setDate=findViewById(R.id.setDate)
+
         dbHelper=DbHelper(this)
+        nextBtn=findViewById(R.id.nextBtn)
 
         fileSavedBtn.setOnClickListener {
             saveDatabaseToDownloads()
         }
 
-        setDate.setOnClickListener {
-            val popupMenu = PopupMenu(this, setDate)
-            popupMenu.menu.add("Today")
-            popupMenu.menu.add("Set Range")
-
-            popupMenu.setOnMenuItemClickListener { menuItem ->
-                when (menuItem.title) {
-                    "Today" -> {
-                        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                        Log.d("DateCheck", "Today's Date: $today") // Debugging Log
-                        setDate.text = today
-
-                    }
-                    "Set Range" -> {
-                        showDateRangePicker { start, end ->
-                            setDate.text = " $start  to  $end "
-                            dbHelper.getMachineDataByDateRange(start,end)
-                        }
-                    }
-                }
-                true
-            }
-            popupMenu.show()
-        }
 
 
+       nextBtn.setOnClickListener {
+           startActivity(Intent(this@MainActivity,HistoricDataShowing::class.java))
+       }
 
 
 
@@ -210,19 +191,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    private fun showDateRangePicker(onRangeSelected: (String, String) -> Unit) {
-        val dateRangePicker =
-            MaterialDatePicker.Builder.dateRangePicker().setTitleText("Select Date Range").build()
 
-        dateRangePicker.addOnPositiveButtonClickListener { selection ->
-            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            startDate = sdf.format(Date(selection.first!!))
-            endDate = sdf.format(Date(selection.second!!))
-            onRangeSelected(startDate, endDate) // Return start and end dates separately
-        }
-
-        dateRangePicker.show(supportFragmentManager, "DATE_PICKER")
-    }
 
 
     override fun onDestroy() {

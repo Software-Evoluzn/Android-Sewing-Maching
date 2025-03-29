@@ -6,4 +6,19 @@
     </style>
 
     <style name="Theme.EvoluznSewingMachine" parent="Base.Theme.EvoluznSewingMachine" />
+
+
+    <style name="CustomDatePicker" parent="ThemeOverlay.MaterialComponents.MaterialCalendar">
+        <item name="materialCalendarStyle">@style/CustomMaterialCalendarStyle</item>
+        <item name="materialCalendarFullscreenTheme">@style/CustomMaterialCalendarFullscreen</item>
+    </style>
+
+    <style name="CustomMaterialCalendarStyle" parent="Widget.MaterialComponents.MaterialCalendar">
+        <item name="android:background">#FFFFFF</item>
+    </style>
+
+    <style name="CustomMaterialCalendarFullscreen" parent="Theme.MaterialComponents.Light">
+        <item name="android:windowBackground">#F5F5F5</item>
+    </style>
+
 </resources>

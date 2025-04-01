@@ -261,6 +261,277 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
         return machineData
     }
 
+    fun productionTimeGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
+        val productionTimeList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', dateAndTime) AS hour_start,
+            SUM($COL_TIME) AS total_production_time
+        FROM $TABLE_NAME
+        WHERE dateAndTime BETWEEN ? AND ?
+        GROUP BY strftime('%Y-%m-%d %H', dateAndTime)
+        ORDER BY hour_start;
+    """
+
+        try {
+            val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // First column: hour_start
+                val totalProductionTime = cursor.getInt(1) // Second column: total_production_time
+                productionTimeList.add(Pair(hourStart, totalProductionTime))
+            }
+            cursor.close()
+            // Debugging
+            println("Query Results: $productionTimeList")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
+
+        return productionTimeList
+    }
+
+    fun productionCountGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
+        val productionCountList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', dateAndTime) AS hour_start,
+            SUM($COL_PUSH_BACK_COUNT) AS total_production_count
+        FROM $TABLE_NAME
+        WHERE dateAndTime BETWEEN ? AND ?
+        GROUP BY strftime('%Y-%m-%d %H', dateAndTime)
+        ORDER BY hour_start;
+    """
+
+        try {
+            val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // First column: hour_start
+                val totalProductionCount = cursor.getInt(1) // Second column: total_production_count
+                productionCountList.add(Pair(hourStart, totalProductionCount))
+            }
+            cursor.close()
+            // Debugging
+            println("Query Results: $productionCountList")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
+
+        return productionCountList
+    }
+
+    fun stitchCountGraph(startDate:String,endDate:String):List<Pair<String, Int>>{
+        val stitchCountList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', dateAndTime) AS hour_start,
+            SUM($COL_STITCH_COUNT) AS total_production_count
+        FROM $TABLE_NAME
+        WHERE dateAndTime BETWEEN ? AND ?
+        GROUP BY strftime('%Y-%m-%d %H', dateAndTime)
+        ORDER BY hour_start;
+    """
+
+        try {
+            val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // First column: hour_start
+                val totalProductionCount = cursor.getInt(1) // Second column: total_production_count
+                stitchCountList.add(Pair(hourStart, totalProductionCount))
+            }
+            cursor.close()
+            // Debugging
+            println("Query Results: $stitchCountList")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
+
+        return stitchCountList
+
+    }
+
+    fun oilLevelGraph(startDate:String,endDate:String):List<Pair<String, Int>>{
+        val oilLevelList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', dateAndTime) AS hour_start,
+            AVG($COL_OIL_LEVEL) AS total_production_count
+        FROM $TABLE_NAME
+        WHERE dateAndTime BETWEEN ? AND ?
+        GROUP BY strftime('%Y-%m-%d %H', dateAndTime)
+        ORDER BY hour_start;
+    """
+
+        try {
+            val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // First column: hour_start
+                val totalProductionCount = cursor.getInt(1) // Second column: total_production_count
+                oilLevelList.add(Pair(hourStart, totalProductionCount))
+            }
+            cursor.close()
+            // Debugging
+            println("Query Results: $oilLevelList")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
+
+        return oilLevelList
+
+    }
+
+    fun temperatureGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
+        val temperatureList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT dateAndTime, $COL_TEMPERATURE 
+        FROM $TABLE_NAME 
+        WHERE (dateAndTime, rowid) IN (
+            SELECT MAX(dateAndTime), MAX(rowid)
+            FROM $TABLE_NAME 
+            WHERE dateAndTime BETWEEN ? AND ?
+            GROUP BY strftime('%Y-%m-%d %H', dateAndTime)
+        )
+        ORDER BY dateAndTime;
+    """
+
+        try {
+            val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // First column: latest timestamp per hour
+                val latestTemperature = cursor.getInt(1) // Second column: latest temperature value
+                temperatureList.add(Pair(hourStart, latestTemperature))
+            }
+            cursor.close()
+            // Debugging
+            println("Query Results: $temperatureList")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
+
+        return temperatureList
+    }
+
+
+    fun vibrationGraph(startDate:String,endDate:String):List<Pair<String, Int>>{
+        val vibrationList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', dateAndTime) AS hour_start,
+            AVG($COL_VIBRATION) AS total_production_count
+        FROM $TABLE_NAME
+        WHERE dateAndTime BETWEEN ? AND ?
+        GROUP BY strftime('%Y-%m-%d %H', dateAndTime)
+        ORDER BY hour_start;
+    """
+
+        try {
+            val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // First column: hour_start
+                val totalProductionCount = cursor.getInt(1) // Second column: total_production_count
+                vibrationList.add(Pair(hourStart, totalProductionCount))
+            }
+            cursor.close()
+            // Debugging
+            println("Query Results: $vibrationList")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
+
+        return vibrationList
+
+    }
+
+    fun bobbinThreadGraph(startDate:String,endDate:String):List<Pair<String, Int>>{
+        val bobbinThreadList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', dateAndTime) AS hour_start,
+            SUM($COL_THREAD_PERCENT*2.54) AS total_production_count
+        FROM $TABLE_NAME
+        WHERE dateAndTime BETWEEN ? AND ?
+        GROUP BY strftime('%Y-%m-%d %H', dateAndTime)
+        ORDER BY hour_start;
+    """
+
+        try {
+            val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // First column: hour_start
+                val totalProductionCount = cursor.getInt(1) // Second column: total_production_count
+                bobbinThreadList.add(Pair(hourStart, totalProductionCount))
+            }
+            cursor.close()
+            // Debugging
+            println("Query Results: $bobbinThreadList")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
+
+        return bobbinThreadList
+
+    }
+
+    fun stitchPerInchGraph(startDate: String, endDate: String): List<Pair<String, Float>> {
+        val stitchPerInchList = mutableListOf<Pair<String, Float>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', dateAndTime) AS hour_start,
+            SUM(CASE 
+                    WHEN $COL_THREAD_PERCENT > 0 
+                    THEN CAST($COL_STITCH_COUNT AS FLOAT) / $COL_THREAD_PERCENT 
+                    ELSE 0 
+                END) AS total_stitch_per_inch
+        FROM $TABLE_NAME
+        WHERE dateAndTime BETWEEN ? AND ?
+        GROUP BY strftime('%Y-%m-%d %H', dateAndTime)
+        ORDER BY hour_start;
+    """
+
+        try {
+            val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // First column: hour_start
+                val totalStitchPerInch = cursor.getFloat(1) // Second column: total_stitch_per_inch
+                stitchPerInchList.add(Pair(hourStart, totalStitchPerInch))
+            }
+            cursor.close()
+            // Debugging
+            println("Query Results: $stitchPerInchList")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
+
+        return stitchPerInchList
+    }
+
+
+
+
+
 
 
 

@@ -28,5 +28,6 @@
     <string name="showing_historic_data">Showing Historic Data</string>
     <string name="apply">Apply</string>
     <string name="stitch_count_per_inch">STITCH COUNT PER INCH</string>
+    <string name="production_time_graph">Production Time Graph</string>
 
 </resources>

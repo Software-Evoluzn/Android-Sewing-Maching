@@ -42,6 +42,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation ("com.github.felHR85:UsbSerial:6.0.0")
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
     implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

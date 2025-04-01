@@ -45,15 +45,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var threadConsumption:TextView
     lateinit var resetBtn:AppCompatButton
     private lateinit var fileSavedBtn:ImageButton
-
-    lateinit var startDate: String
-    lateinit var endDate: String
     lateinit var nextBtn:AppCompatButton
-
-
     lateinit var dbHelper:DbHelper
     private val usbDataViewModel: UsbDataViewModel by viewModels()
-
 
     private val usbDisconnectReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -64,7 +58,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
     private val usbNotConnectReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent != null) {
@@ -75,14 +68,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-
-
 
         time=findViewById(R.id.time)
         pushBackCount=findViewById(R.id.count)
@@ -94,23 +84,15 @@ class MainActivity : AppCompatActivity() {
         threadConsumption=findViewById(R.id.threadConsumptionValue)
         resetBtn=findViewById(R.id.resetBtn)
         fileSavedBtn=findViewById(R.id.dbFileSave)
-
         dbHelper=DbHelper(this)
         nextBtn=findViewById(R.id.nextBtn)
 
         fileSavedBtn.setOnClickListener {
             saveDatabaseToDownloads()
         }
-
-
-
-       nextBtn.setOnClickListener {
+        nextBtn.setOnClickListener {
            startActivity(Intent(this@MainActivity,HistoricDataShowing::class.java))
        }
-
-
-
-
         // USB Service start karein
         val serviceIntent = Intent(this, UsbService::class.java)
         startService(serviceIntent)
@@ -182,24 +164,13 @@ class MainActivity : AppCompatActivity() {
                 usbDataViewModel.threadConsumption
             }, 3000)
         }
-
-
-
-
-
     }
-
-
-
-
-
 
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(usbDisconnectReceiver)
         unregisterReceiver(usbNotConnectReceiver)
     }
-
     private fun showUsbDisconnectedDialog() {
         AlertDialog.Builder(this)
             .setTitle("USB Disconnected")
@@ -208,7 +179,6 @@ class MainActivity : AppCompatActivity() {
             .setCancelable(false)
             .show()
     }
-
     private fun showUsbNotconnectedDialog() {
         AlertDialog.Builder(this)
             .setTitle("USB Not connected")
@@ -217,7 +187,6 @@ class MainActivity : AppCompatActivity() {
             .setCancelable(false)
             .show()
     }
-
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun saveDatabaseToDownloads() {
@@ -228,9 +197,7 @@ class MainActivity : AppCompatActivity() {
             put(MediaStore.Downloads.MIME_TYPE, "application/x-sqlite3")
             put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
         }
-
         val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-
         uri?.let {
             try {
                 resolver.openOutputStream(it)?.use { outputStream ->

@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.Window
 import android.view.WindowManager
 import android.widget.ImageButton
@@ -17,8 +16,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.PopupMenu
 import androidx.cardview.widget.CardView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.MarkerView
@@ -27,10 +24,8 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.highlight.Highlight
-import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -59,6 +54,7 @@ class HistoricDataShowing : AppCompatActivity() {
     lateinit var vibrationCardView:CardView
     lateinit var bobbinThreadCardView:CardView
     lateinit var stitchPerInchCardView:CardView
+    var isToday:Boolean = false
     lateinit var dbHelpher:DbHelper
 
 
@@ -113,14 +109,26 @@ class HistoricDataShowing : AppCompatActivity() {
                         startDate = today
                         endDate = today
 
-                        fetchAndDisplayData(startDate, endDate)  // Fetch immediately
+                        isToday=true
+                        applyBtn.setOnClickListener {
+                            fetchAndDisplayData(startDate, endDate)  // Fetch immediately
+                        }
+
                     }
                     "Set Range" -> {
                         showDateRangePicker { start, end ->
                             setDate.text = "$start to $end"
                             startDate = start
                             endDate = end
-                            fetchAndDisplayData(startDate, endDate)  // Fetch immediately
+                            if(startDate==endDate){
+                                isToday=true
+                            }else{
+                                isToday=false
+                            }
+
+                            applyBtn.setOnClickListener {
+                                fetchAndDisplayData(startDate, endDate)  // Fetch immediately
+                            }
                         }
                     }
                 }
@@ -128,81 +136,87 @@ class HistoricDataShowing : AppCompatActivity() {
             }
             popupMenu.show()
         }
-
-// Apply button should fetch data based on already selected dates
-        applyBtn.setOnClickListener {
-            if (this::startDate.isInitialized && this::endDate.isInitialized) {
-                fetchAndDisplayData(startDate, endDate)
-            } else {
-                Toast.makeText(this, "Please select a date range first", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-
         productionTimeCardView.setOnClickListener {
             checkAndShowGraph("Production Time Graph") { start, end ->
-                dbHelpher.productionTimeGraph(start, end)
+                if(isToday){
+                    dbHelpher.productionTimeGraph(start, end)
+                }else{
+                    dbHelpher.productionTimeForSetRangeGraph(start, end)
+                }
+
             }
         }
-
-
-
         productionCountCardView.setOnClickListener {
             checkAndShowGraph("Production Count Graph") { start, end ->
-                dbHelpher.productionCountGraph(start, end)
+                if(isToday){
+                    dbHelpher.productionCountGraph(start, end)
+                }else{
+                    dbHelpher.productionCountForSetRangeGraph(start, end)
+                }
             }
         }
-
-
-
         oilLevelCardView.setOnClickListener {
             checkAndShowGraph("Oil Level Graph") { start, end ->
-                dbHelpher.oilLevelGraph(start, end)
+                if(isToday){
+                    dbHelpher.oilLevelGraph(start, end)
+                }else{
+                    dbHelpher.oilLevelForSetRangeGraph(startDate, endDate)
+                }
+
+
             }
         }
-
-
 
         stitchCountCardView.setOnClickListener {
             checkAndShowGraph("Stitch Count Graph") { start, end ->
-                dbHelpher.stitchCountGraph(start, end)
+                if(isToday){
+                    dbHelpher.stitchCountGraph(start, end)
+                }else{
+                    dbHelpher.stitchCountForSetRangeGraph(startDate, endDate)
+                }
+
             }
         }
-
-
-
         temperatureCardView.setOnClickListener {
             checkAndShowGraph("Temperature Graph") { start, end ->
-                dbHelpher.temperatureGraph(start, end)
+                if(isToday){
+                    dbHelpher.temperatureGraph(start, end)
+                }else{
+                    dbHelpher.temperatureForSetRangeGraph(startDate, endDate)
+                }
+
             }
         }
-
-
-
         vibrationCardView.setOnClickListener {
             checkAndShowGraph("Vibration Graph") { start, end ->
-                dbHelpher.vibrationGraph(start, end)
+                if(isToday){
+                    dbHelpher.vibrationGraph(start, end)
+                }else{
+                    dbHelpher.vibrationForSetRangeGraph(startDate, endDate)
+                }
+
             }
         }
-
-
-
         bobbinThreadCardView.setOnClickListener {
             checkAndShowGraph("Bobbin Thread Graph") { start, end ->
-                dbHelpher.bobbinThreadGraph(start, end)
+                if(isToday){
+                    dbHelpher.bobbinThreadGraph(start, end)
+                }else{
+                    dbHelpher.bobbinThreadForSetRangeGraph(startDate, endDate)
+                }
+
             }
         }
-
-
-
         stitchPerInchCardView.setOnClickListener {
             checkAndShowGraph("Stitches Per Inch  Graph") { start, end ->
-                dbHelpher.stitchPerInchGraph(start, end)
+                if(isToday){
+                    dbHelpher.stitchPerInchGraph(start, end)
+                }else{
+                    dbHelpher.stitchCountPerInchForSetRangeGraph(startDate, endDate)
+                }
+
             }
         }
-
-
-
     }
 
     private fun showGraphDialog(title: String, GraphData: List<Pair<String, Number>>) {
@@ -217,9 +231,18 @@ class HistoricDataShowing : AppCompatActivity() {
 
         val barChart = dialog.findViewById<BarChart>(R.id.productionTimeChart)
         val titleTextView = dialog.findViewById<TextView>(R.id.title)
+        val dateTextView=dialog.findViewById<TextView>(R.id.showingDate)
 
         // Set dynamic title
         titleTextView.text = title
+
+        // **Show the Selected Date in UI**
+        val dateToShow = if (startDate == endDate) {
+            "Date: $startDate"  // Single date (Today case)
+        } else {
+            "Date Range: $startDate to $endDate" // Set range case
+        }
+        dateTextView.text = dateToShow
 
         // If no data is available, show a message and return
         if (GraphData.isEmpty()) {
@@ -228,27 +251,44 @@ class HistoricDataShowing : AppCompatActivity() {
             return
         }
 
-        // Extract production data mapped to hours (0-23)
-        val hourMap = GraphData.associate { it.first.substring(11, 13).toInt() to it.second.toFloat() }
+        val entries = mutableListOf<BarEntry>()
+        val hourLabels = mutableListOf<String>()
 
-        // Create bar entries, ensuring all 24 hours are represented
-        val fullEntries = (0..23).map { hour ->
-            BarEntry(hour.toFloat(), hourMap[hour] ?: 0f) // Use 0 if no data for that hour
+        if (isToday) {
+            // Ensure we collect unique hourly values (fix duplicate hours issue)
+            val hourMap = mutableMapOf<Int, Float>()
+
+            GraphData.forEach {
+                val hour = it.first.substring(11, 13).toInt()
+                hourMap[hour] = hourMap.getOrDefault(hour, 0f) + it.second.toFloat()
+            }
+
+            // Populate 24-hour range to avoid missing hours
+            for (hour in 0..23) {
+                entries.add(BarEntry(hour.toFloat(), hourMap.getOrDefault(hour, 0f)))
+                hourLabels.add(String.format("%02d:00", hour)) // Correct fixed labels
+            }
+        } else {
+            // Ensure unique timestamps for non-today cases
+            GraphData.forEachIndexed { index, pair ->
+                entries.add(BarEntry(index.toFloat(), pair.second.toFloat()))
+               hourLabels.add(pair.first) // Correctly formatted "yyyy-MM-dd HH:mm"
+            }
         }
 
         // Setup Bar Chart Data
-        val dataSet = BarDataSet(fullEntries, "Production Time").apply {
+        val dataSet = BarDataSet(entries, "Production Time").apply {
             color = Color.BLUE
             setDrawValues(false)  // Hide values above bars
         }
 
         val barData = BarData(dataSet).apply {
-            barWidth = 0.2f  // Adjust bar width for better alignment
+            barWidth = 0.4f  // Adjust bar width for better alignment
         }
 
         barChart.data = barData
 
-        // X-Axis Configuration (Ensure 24-hour format labels)
+        // X-Axis Configuration
         barChart.xAxis.apply {
             position = XAxis.XAxisPosition.BOTTOM
             granularity = 1f
@@ -256,10 +296,7 @@ class HistoricDataShowing : AppCompatActivity() {
             textSize = 12f
             textColor = Color.BLACK
             labelRotationAngle = -45f
-            setAvoidFirstLastClipping(true)
-
-            // Define fixed 24-hour label list (00:00 to 23:00)
-            val hourLabels = (0..23).map { String.format("%02d:00", it) }
+            setAvoidFirstLastClipping(false)
 
             valueFormatter = object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
@@ -268,7 +305,7 @@ class HistoricDataShowing : AppCompatActivity() {
                 }
             }
 
-            setLabelCount(24, true) // Ensure all 24-hour labels are shown
+            setLabelCount(hourLabels.size, false) // Ensure labels are shown dynamically
         }
 
         // Y-Axis Configuration
@@ -276,10 +313,7 @@ class HistoricDataShowing : AppCompatActivity() {
             axisMinimum = 0f // Ensure Y-axis starts from 0
             setDrawGridLines(false)
         }
-        barChart.setScaleEnabled(true)  // Allow pinch zooming
-        barChart.setPinchZoom(true)     // Enable smooth zooming
-        barChart.isDragEnabled = true   // Allow horizontal scrolling
-        barChart.xAxis.setAvoidFirstLastClipping(true) // Prevent label cut-off
+
         barChart.axisRight.isEnabled = false // Hide right Y-axis
         barChart.xAxis.setDrawGridLines(false)
 
@@ -288,13 +322,14 @@ class HistoricDataShowing : AppCompatActivity() {
         barChart.legend.isEnabled = false
 
         // Ensure bars are spaced properly
-        barChart.setVisibleXRangeMaximum(6f) // Show only 6 bars at a time
+        barChart.setVisibleXRangeMaximum(12f) // Show only 6 bars at a time
         barChart.moveViewToX(0f)  // Start from the beginning of the chart
 
+
         // Ensure correct scaling to fit all bars
-        barChart.xAxis.axisMinimum = 0f
-        barChart.xAxis.axisMaximum = 23f
-        barChart.setFitBars(true)
+        barChart.setScaleEnabled(true)  // Allow pinch zooming
+        barChart.setPinchZoom(true)     // Enable smooth zooming
+        barChart.isDragEnabled = true   // Allow horizontal scrolling
 
         // Animation for smooth appearance
         barChart.animateY(1000, Easing.EaseInOutQuad)
@@ -313,7 +348,6 @@ class HistoricDataShowing : AppCompatActivity() {
 
         dialog.show()
     }
-
 
     private fun showDateRangePicker(onRangeSelected: (String, String) -> Unit) {
         val dateRangePicker = MaterialDatePicker.Builder.dateRangePicker()
@@ -362,26 +396,27 @@ class HistoricDataShowing : AppCompatActivity() {
     }
 
     private fun checkAndShowGraph(title: String, fetchData: (String, String) -> List<Pair<String, Number>>) {
-        if (!this::startDate.isInitialized || !this::endDate.isInitialized) {
-            // Show an alert dialog to prompt user to select a date range
+        if (startDate.isEmpty() || endDate.isEmpty()) {  // Ensure dates are set
             AlertDialog.Builder(this)
                 .setTitle("Date Range Required")
                 .setMessage("Please select a date range before viewing the graph.")
                 .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
                 .show()
-        } else {
-            val start = "$startDate 00:00:00"
-            val end = "$endDate 23:59:59"
-            val data = fetchData(start, end)
+            return
+        }
 
-            if (data.isEmpty()) {
-                Toast.makeText(this, "No data found in the database!", Toast.LENGTH_SHORT).show()
-            } else {
-                showGraphDialog(title, data)
-            }
+//       val isToday = startDate == endDate // Check if the user selected "Today"
+        val start = "$startDate 00:00:00"
+        val end = "$endDate 23:59:59"
+
+        val data = fetchData(start, end)
+
+        if (data.isEmpty()) {
+            Toast.makeText(this, "No data found in the database!", Toast.LENGTH_SHORT).show()
+        } else {
+            showGraphDialog(title, data) // Pass `isToday` to adjust labels dynamically
         }
     }
-
 
 
 }

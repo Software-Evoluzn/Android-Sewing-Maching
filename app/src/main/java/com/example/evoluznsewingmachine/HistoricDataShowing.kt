@@ -19,12 +19,17 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.cardview.widget.CardView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.components.MarkerView
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.utils.ColorTemplate
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
@@ -200,7 +205,7 @@ class HistoricDataShowing : AppCompatActivity() {
 
     }
 
-    private fun showGraphDialog(title: String,productionTimes: List<Pair<String, Number>>) {
+    private fun showGraphDialog(title: String, GraphData: List<Pair<String, Number>>) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_chart)
@@ -211,57 +216,103 @@ class HistoricDataShowing : AppCompatActivity() {
         )
 
         val barChart = dialog.findViewById<BarChart>(R.id.productionTimeChart)
-        val titleTextView = dialog.findViewById<TextView>(R.id.title) // Get the TextView
+        val titleTextView = dialog.findViewById<TextView>(R.id.title)
 
         // Set dynamic title
         titleTextView.text = title
 
-        // Ensure there is data to display
-        if (productionTimes.isEmpty()) {
-            Toast.makeText(this, "No production times available.", Toast.LENGTH_SHORT).show()
+        // If no data is available, show a message and return
+        if (GraphData.isEmpty()) {
+            Toast.makeText(this, "No Data available.", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
             return
         }
 
-        // Extract labels (time in HH:mm format) and values
-        val labels = productionTimes.map { it.first }  // Extracting time labels
-        val entries = productionTimes.mapIndexed { index, pair ->
-            BarEntry(index.toFloat(), pair.second.toFloat())  // Creating bar entries
+        // Extract production data mapped to hours (0-23)
+        val hourMap = GraphData.associate { it.first.substring(11, 13).toInt() to it.second.toFloat() }
+
+        // Create bar entries, ensuring all 24 hours are represented
+        val fullEntries = (0..23).map { hour ->
+            BarEntry(hour.toFloat(), hourMap[hour] ?: 0f) // Use 0 if no data for that hour
         }
 
         // Setup Bar Chart Data
-        val dataSet = BarDataSet(entries, "Production Time")
-        dataSet.color = Color.RED
-        dataSet.setDrawValues(true)  // Show values on bars
+        val dataSet = BarDataSet(fullEntries, "Production Time").apply {
+            color = Color.BLUE
+            setDrawValues(false)  // Hide values above bars
+        }
 
-        val barData = BarData(dataSet)
-        barData.barWidth = 0.3f  // Adjust bar width
+        val barData = BarData(dataSet).apply {
+            barWidth = 0.2f  // Adjust bar width for better alignment
+        }
+
         barChart.data = barData
 
-        // X-Axis customization
-        barChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-        barChart.xAxis.valueFormatter = IndexAxisValueFormatter(labels)
-        barChart.xAxis.granularity = 1f
-        barChart.xAxis.textSize = 12f
-        barChart.xAxis.textColor = Color.BLACK
-        barChart.xAxis.labelRotationAngle = -45f // Rotate for better visibility
+        // X-Axis Configuration (Ensure 24-hour format labels)
+        barChart.xAxis.apply {
+            position = XAxis.XAxisPosition.BOTTOM
+            granularity = 1f
+            isGranularityEnabled = true
+            textSize = 12f
+            textColor = Color.BLACK
+            labelRotationAngle = -45f
+            setAvoidFirstLastClipping(true)
 
-        // Y-Axis settings
-        barChart.axisLeft.axisMinimum = 0f  // Ensure Y-axis starts from 0
-        barChart.axisLeft.setDrawGridLines(false)
-        barChart.xAxis.setDrawGridLines(false)
+            // Define fixed 24-hour label list (00:00 to 23:00)
+            val hourLabels = (0..23).map { String.format("%02d:00", it) }
+
+            valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    val index = value.toInt()
+                    return if (index in hourLabels.indices) hourLabels[index] else ""
+                }
+            }
+
+            setLabelCount(24, true) // Ensure all 24-hour labels are shown
+        }
+
+        // Y-Axis Configuration
+        barChart.axisLeft.apply {
+            axisMinimum = 0f // Ensure Y-axis starts from 0
+            setDrawGridLines(false)
+        }
+        barChart.setScaleEnabled(true)  // Allow pinch zooming
+        barChart.setPinchZoom(true)     // Enable smooth zooming
+        barChart.isDragEnabled = true   // Allow horizontal scrolling
+        barChart.xAxis.setAvoidFirstLastClipping(true) // Prevent label cut-off
         barChart.axisRight.isEnabled = false // Hide right Y-axis
+        barChart.xAxis.setDrawGridLines(false)
 
-        // Hide description and legend
+        // Hide description and legend for a cleaner look
         barChart.description.isEnabled = false
         barChart.legend.isEnabled = false
 
-        barChart.invalidate()  // Refresh chart
+        // Ensure bars are spaced properly
+        barChart.setVisibleXRangeMaximum(6f) // Show only 6 bars at a time
+        barChart.moveViewToX(0f)  // Start from the beginning of the chart
+
+        // Ensure correct scaling to fit all bars
+        barChart.xAxis.axisMinimum = 0f
+        barChart.xAxis.axisMaximum = 23f
+        barChart.setFitBars(true)
+
+        // Animation for smooth appearance
+        barChart.animateY(1000, Easing.EaseInOutQuad)
+
+        // Custom marker view to show values on touch
+        val markerView = object : MarkerView(this, R.layout.custom_mark_view) {
+            private val textView: TextView = findViewById(R.id.markerText)
+
+            override fun refreshContent(e: Entry?, highlight: Highlight?) {
+                textView.text = "Value: ${e?.y?.toInt()}" // Show value on touch
+                super.refreshContent(e, highlight)
+            }
+        }
+
+        barChart.marker = markerView // Attach marker view
+
         dialog.show()
     }
-
-
-
 
 
     private fun showDateRangePicker(onRangeSelected: (String, String) -> Unit) {

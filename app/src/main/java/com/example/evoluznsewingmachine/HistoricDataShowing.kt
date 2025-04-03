@@ -31,7 +31,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.lifecycle.Observer
+
 
 class HistoricDataShowing : AppCompatActivity() {
 
@@ -91,11 +91,6 @@ class HistoricDataShowing : AppCompatActivity() {
         stitchPerInchCardView=findViewById(R.id.threadConsumption)
 
 
-
-        ObserveLiveData()
-
-
-
         backBtn.setOnClickListener {
             startActivity(Intent(this@HistoricDataShowing,MainActivity::class.java))
         }
@@ -141,85 +136,119 @@ class HistoricDataShowing : AppCompatActivity() {
             popupMenu.show()
         }
         productionTimeCardView.setOnClickListener {
-            checkAndShowGraph("Production Time Graph") { start, end ->
-                if(isToday){
-                    dbHelpher.productionTimeGraph(start, end)
-                }else{
-                    dbHelpher.productionTimeForSetRangeGraph(start, end)
+            if (::startDate.isInitialized && ::endDate.isInitialized) {
+                checkAndShowGraph("Production Time Graph") { start, end ->
+                    if (isToday) {
+                        dbHelpher.productionTimeGraph(start, end)
+                    } else {
+                        dbHelpher.productionTimeForSetRangeGraph(start, end)
+                    }
                 }
+            } else {
+                showAlertDialog()
 
             }
         }
+
         productionCountCardView.setOnClickListener {
-            checkAndShowGraph("Production Count Graph") { start, end ->
-                if(isToday){
-                    dbHelpher.productionCountGraph(start, end)
-                }else{
-                    dbHelpher.productionCountForSetRangeGraph(start, end)
+            if (::startDate.isInitialized && ::endDate.isInitialized) {
+                checkAndShowGraph("Production Count Graph") { start, end ->
+                    if (isToday) {
+                        dbHelpher.productionCountGraph(start, end)
+                    } else {
+                        dbHelpher.productionCountForSetRangeGraph(start, end)
+                    }
                 }
+            }else{
+                showAlertDialog()
             }
         }
         oilLevelCardView.setOnClickListener {
-            checkAndShowGraph("Oil Level Graph") { start, end ->
-                if(isToday){
-                    dbHelpher.oilLevelGraph(start, end)
-                }else{
-                    dbHelpher.oilLevelForSetRangeGraph(startDate, endDate)
+            if(::startDate.isInitialized && ::endDate.isInitialized){
+                checkAndShowGraph("Oil Level Graph") { start, end ->
+                    if(isToday){
+                        dbHelpher.oilLevelGraph(start, end)
+                    }else{
+                        dbHelpher.oilLevelForSetRangeGraph(startDate, endDate)
+                    }
                 }
-
-
+            }else{
+                showAlertDialog()
             }
+
         }
 
         stitchCountCardView.setOnClickListener {
-            checkAndShowGraph("Stitch Count Graph") { start, end ->
-                if(isToday){
-                    dbHelpher.stitchCountGraph(start, end)
-                }else{
-                    dbHelpher.stitchCountForSetRangeGraph(startDate, endDate)
+            if(::startDate.isInitialized && ::endDate.isInitialized){
+                checkAndShowGraph("Stitch Count Graph") { start, end ->
+                    if(isToday){
+                        dbHelpher.stitchCountGraph(start, end)
+                    }else{
+                        dbHelpher.stitchCountForSetRangeGraph(startDate, endDate)
+                    }
                 }
+            }else{
+                showAlertDialog()
 
             }
+
         }
         temperatureCardView.setOnClickListener {
-            checkAndShowGraph("Temperature Graph") { start, end ->
-                if(isToday){
-                    dbHelpher.temperatureGraph(start, end)
-                }else{
-                    dbHelpher.temperatureForSetRangeGraph(startDate, endDate)
+            if(::startDate.isInitialized && ::endDate.isInitialized){
+                checkAndShowGraph("Temperature Graph") { start, end ->
+                    if(isToday){
+                        dbHelpher.temperatureGraph(start, end)
+                    }else{
+                        dbHelpher.temperatureForSetRangeGraph(startDate, endDate)
+                    }
                 }
-
+            }else{
+                showAlertDialog()
             }
+
         }
         vibrationCardView.setOnClickListener {
-            checkAndShowGraph("Vibration Graph") { start, end ->
-                if(isToday){
-                    dbHelpher.vibrationGraph(start, end)
-                }else{
-                    dbHelpher.vibrationForSetRangeGraph(startDate, endDate)
-                }
 
+            if(::startDate.isInitialized && ::endDate.isInitialized){
+                checkAndShowGraph("Vibration Graph") { start, end ->
+                    if(isToday){
+                        dbHelpher.vibrationGraph(start, end)
+                    }else{
+                        dbHelpher.vibrationForSetRangeGraph(startDate, endDate)
+                    }
+                }
+            }else{
+                showAlertDialog()
             }
+
         }
         bobbinThreadCardView.setOnClickListener {
-            checkAndShowGraph("Bobbin Thread Graph") { start, end ->
-                if(isToday){
-                    dbHelpher.bobbinThreadGraph(start, end)
-                }else{
-                    dbHelpher.bobbinThreadForSetRangeGraph(startDate, endDate)
+            if(::startDate.isInitialized && ::endDate.isInitialized){
+                checkAndShowGraph("Bobbin Thread Graph") { start, end ->
+                    if(isToday){
+                        dbHelpher.bobbinThreadGraph(start, end)
+                    }else{
+                        dbHelpher.bobbinThreadForSetRangeGraph(startDate, endDate)
+                    }
                 }
-
+            }else{
+                showAlertDialog()
             }
+
         }
         stitchPerInchCardView.setOnClickListener {
-            checkAndShowGraph("Stitches Per Inch  Graph") { start, end ->
-                if(isToday){
-                    dbHelpher.stitchPerInchGraph(start, end)
-                }else{
-                    dbHelpher.stitchCountPerInchForSetRangeGraph(startDate, endDate)
+            if(::startDate.isInitialized && ::endDate.isInitialized){
+                checkAndShowGraph("Stitches Per Inch  Graph") { start, end ->
+                    if(isToday){
+                        dbHelpher.stitchPerInchGraph(start, end)
+                    }else{
+                        dbHelpher.stitchCountPerInchForSetRangeGraph(startDate, endDate)
+                    }
                 }
-
+            }else{
+                showAlertDialog()
             }
+
         }
     }
 
@@ -422,39 +451,14 @@ class HistoricDataShowing : AppCompatActivity() {
         }
     }
 
-     private fun ObserveLiveData(){
-         // Observe LiveData and update UI
-         usbDataViewModel.productionTime.observe(this, Observer {
-             p_time.text = it
-         })
 
-         usbDataViewModel.productionCount.observe(this, Observer {
-             p_count.text = it
-         })
-
-         usbDataViewModel.temperature.observe(this, Observer {
-             p_temp.text = it
-         })
-
-         usbDataViewModel.vibrationValue.observe(this, Observer {
-             p_vibration.text = it
-         })
-
-         usbDataViewModel.oilLevel.observe(this, Observer {
-             p_oil_level.text = it
-         })
-
-         usbDataViewModel.threadPercent.observe(this, Observer {
-             p_bobbin_thread.text = it
-         })
-
-         usbDataViewModel.stitchCount.observe(this, Observer {
-             p_sitch_count.text = it
-         })
-
-         usbDataViewModel.threadConsumption.observe(this, Observer {
-             p_stitch_per_inch.text = it
-         })
+   fun  showAlertDialog(){
+        AlertDialog.Builder(this)
+            .setTitle("Date Range Required")
+            .setMessage("Please select a date range before viewing the graph.")
+            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            .show()
+        return
     }
 
 

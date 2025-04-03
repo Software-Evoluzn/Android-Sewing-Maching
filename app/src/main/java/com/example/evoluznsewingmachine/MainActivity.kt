@@ -31,12 +31,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
@@ -61,6 +63,13 @@ class MainActivity : AppCompatActivity() {
     lateinit var dbHelper:DbHelper
     private val usbDataViewModel: UsbDataViewModel by viewModels()
     lateinit var productionTimeCardView:CardView
+    lateinit var productionCountCardView:CardView
+    lateinit var stitchCountCardView:CardView
+    lateinit var tempCardView:CardView
+    lateinit var vibrationCardView:CardView
+    lateinit var oilLevelCardView:CardView
+    lateinit var bobbinThreadCardView:CardView
+    lateinit var stitchPerInchCardView:CardView
 
     private val usbDisconnectReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -100,9 +109,37 @@ class MainActivity : AppCompatActivity() {
         dbHelper=DbHelper(this)
         nextBtn=findViewById(R.id.nextBtn)
         productionTimeCardView=findViewById(R.id.cardView2)
+        productionCountCardView=findViewById(R.id.cardView)
+        oilLevelCardView=findViewById(R.id.OilLevel)
+        stitchCountCardView=findViewById(R.id.stitchCount)
+        tempCardView=findViewById(R.id.temperature)
+        vibrationCardView=findViewById(R.id.Vibration)
+        bobbinThreadCardView=findViewById(R.id.bobinThreadLevel)
+        stitchPerInchCardView=findViewById(R.id.threadConsumption)
 
         productionTimeCardView.setOnClickListener {
-            showGraph(usbDataViewModel.productionTime)
+            showLiveDateGraph(usbDataViewModel.productionTime)
+        }
+        productionCountCardView.setOnClickListener {
+            showLiveDateGraph(usbDataViewModel.productionCount)
+        }
+        oilLevelCardView.setOnClickListener {
+            showLiveDateGraph(usbDataViewModel.oilLevel)
+        }
+        stitchCountCardView.setOnClickListener {
+            showLiveDateGraph(usbDataViewModel.stitchCount)
+        }
+        tempCardView.setOnClickListener {
+            showLiveDateGraph(usbDataViewModel.temperature)
+        }
+        vibrationCardView.setOnClickListener {
+            showLiveDateGraph(usbDataViewModel.vibrationValue)
+        }
+        bobbinThreadCardView.setOnClickListener {
+            showLiveDateGraph(usbDataViewModel.threadPercent)
+        }
+        stitchPerInchCardView.setOnClickListener {
+            showLiveDateGraph(usbDataViewModel.threadConsumption)
         }
 
         fileSavedBtn.setOnClickListener {
@@ -231,42 +268,93 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showGraph(liveData: LiveData<String>) {
+    private fun showLiveDateGraph(liveData: LiveData<String>) {
         val dialog = Dialog(this)
         dialog.setContentView(R.layout.dialog_chart)
 
         val barChart = dialog.findViewById<BarChart>(R.id.productionTimeChart)
 
-        // Enable chart description and grid
+        // **Chart Settings**
         barChart.description.isEnabled = false
-        barChart.setFitBars(true)
         barChart.setDrawGridBackground(false)
         barChart.setDrawBarShadow(false)
+        barChart.setDrawBorders(false)
+        barChart.setScaleEnabled(true) // Enable zoom & horizontal scroll
+        barChart.isDragEnabled = true
+        barChart.setPinchZoom(true)
 
         val entries = mutableListOf<BarEntry>()
+        val hourLabels = (0..23).map { String.format("%02d:00", it) } // **All 24 hours**
+
         val dataSet = BarDataSet(entries, "Live Data").apply {
             color = Color.BLUE
-            valueTextColor = Color.WHITE
+            valueTextColor = Color.BLACK
+            setDrawValues(true) // Show values above bars
         }
-        val barData = BarData(dataSet)
-        barData.barWidth = 0.9f // Set bar width
 
+        val barData = BarData(dataSet)
+        barData.barWidth = 0.4f
         barChart.data = barData
-        barChart.setFitBars(true)
-        barChart.invalidate()
+
+        // **Customize X Axis (Fixed 00:00 - 23:00)**
+        barChart.xAxis.apply {
+            position = XAxis.XAxisPosition.BOTTOM
+            granularity = 1f
+            setDrawAxisLine(true)
+            setDrawGridLines(false)
+            textSize = 10f
+            textColor = Color.BLACK
+            labelRotationAngle = -45f
+
+            valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    val index = value.toInt()
+                    return if (index in 0..23) hourLabels[index] else ""
+                }
+            }
+        }
+
+        // **Customize Y Axis**
+        barChart.axisLeft.apply {
+            axisMinimum = 0f
+            setDrawAxisLine(true)
+            setDrawGridLines(false)
+        }
+        barChart.axisRight.isEnabled = false
+
+        // **Store Last 24 Hours Data**
+        val hourMap = mutableMapOf<Int, Float>().apply {
+            for (i in 0..23) this[i] = 0f
+        }
 
         liveData.observe(this) { value ->
             val yValue = value.toFloatOrNull() ?: 0f
-            entries.add(BarEntry(entries.size.toFloat(), yValue))
+            val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+
+            // **Update Data for Current Hour**
+            hourMap[currentHour] = hourMap.getOrDefault(currentHour, 0f) + yValue
+
+            // **Update Graph**
+            entries.clear()
+
+            for (i in 0..23) {
+                entries.add(BarEntry(i.toFloat(), hourMap[i] ?: 0f))
+            }
 
             dataSet.notifyDataSetChanged()
             barChart.data.notifyDataChanged()
             barChart.notifyDataSetChanged()
-            barChart.invalidate() // Refresh the chart
         }
+
+        // **Enable Scrolling for all 24 bars**
+        barChart.xAxis.axisMinimum = -0.5f
+        barChart.xAxis.axisMaximum = 23.5f
+        barChart.setVisibleXRangeMaximum(6f) // Show 6 bars at a time (adjust as needed)
+        barChart.moveViewToX(0f) // Start from 00:00
 
         dialog.show()
     }
+
 
 
 

@@ -11,6 +11,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
@@ -30,6 +31,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.lifecycle.Observer
 
 class HistoricDataShowing : AppCompatActivity() {
 
@@ -56,6 +58,8 @@ class HistoricDataShowing : AppCompatActivity() {
     lateinit var stitchPerInchCardView:CardView
     var isToday:Boolean = false
     lateinit var dbHelpher:DbHelper
+    private val usbDataViewModel: UsbDataViewModel by viewModels()
+
 
 
 
@@ -88,7 +92,7 @@ class HistoricDataShowing : AppCompatActivity() {
 
 
 
-
+        ObserveLiveData()
 
 
 
@@ -416,6 +420,41 @@ class HistoricDataShowing : AppCompatActivity() {
         } else {
             showGraphDialog(title, data) // Pass `isToday` to adjust labels dynamically
         }
+    }
+
+     private fun ObserveLiveData(){
+         // Observe LiveData and update UI
+         usbDataViewModel.productionTime.observe(this, Observer {
+             p_time.text = it
+         })
+
+         usbDataViewModel.productionCount.observe(this, Observer {
+             p_count.text = it
+         })
+
+         usbDataViewModel.temperature.observe(this, Observer {
+             p_temp.text = it
+         })
+
+         usbDataViewModel.vibrationValue.observe(this, Observer {
+             p_vibration.text = it
+         })
+
+         usbDataViewModel.oilLevel.observe(this, Observer {
+             p_oil_level.text = it
+         })
+
+         usbDataViewModel.threadPercent.observe(this, Observer {
+             p_bobbin_thread.text = it
+         })
+
+         usbDataViewModel.stitchCount.observe(this, Observer {
+             p_sitch_count.text = it
+         })
+
+         usbDataViewModel.threadConsumption.observe(this, Observer {
+             p_stitch_per_inch.text = it
+         })
     }
 
 

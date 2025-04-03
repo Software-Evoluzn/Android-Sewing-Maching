@@ -2,11 +2,13 @@ package com.example.evoluznsewingmachine
 
 
 import android.app.DatePickerDialog
+import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -24,7 +26,17 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.PopupMenu
+import androidx.cardview.widget.CardView
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
@@ -48,6 +60,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var nextBtn:AppCompatButton
     lateinit var dbHelper:DbHelper
     private val usbDataViewModel: UsbDataViewModel by viewModels()
+    lateinit var productionTimeCardView:CardView
 
     private val usbDisconnectReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -86,6 +99,11 @@ class MainActivity : AppCompatActivity() {
         fileSavedBtn=findViewById(R.id.dbFileSave)
         dbHelper=DbHelper(this)
         nextBtn=findViewById(R.id.nextBtn)
+        productionTimeCardView=findViewById(R.id.cardView2)
+
+        productionTimeCardView.setOnClickListener {
+            showGraph(usbDataViewModel.productionTime)
+        }
 
         fileSavedBtn.setOnClickListener {
             saveDatabaseToDownloads()
@@ -212,6 +230,45 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun showGraph(liveData: LiveData<String>) {
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.dialog_chart)
+
+        val barChart = dialog.findViewById<BarChart>(R.id.productionTimeChart)
+
+        // Enable chart description and grid
+        barChart.description.isEnabled = false
+        barChart.setFitBars(true)
+        barChart.setDrawGridBackground(false)
+        barChart.setDrawBarShadow(false)
+
+        val entries = mutableListOf<BarEntry>()
+        val dataSet = BarDataSet(entries, "Live Data").apply {
+            color = Color.BLUE
+            valueTextColor = Color.WHITE
+        }
+        val barData = BarData(dataSet)
+        barData.barWidth = 0.9f // Set bar width
+
+        barChart.data = barData
+        barChart.setFitBars(true)
+        barChart.invalidate()
+
+        liveData.observe(this) { value ->
+            val yValue = value.toFloatOrNull() ?: 0f
+            entries.add(BarEntry(entries.size.toFloat(), yValue))
+
+            dataSet.notifyDataSetChanged()
+            barChart.data.notifyDataChanged()
+            barChart.notifyDataSetChanged()
+            barChart.invalidate() // Refresh the chart
+        }
+
+        dialog.show()
+    }
+
+
 
 }
 

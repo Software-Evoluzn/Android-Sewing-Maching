@@ -406,7 +406,7 @@ class HistoricDataShowing : AppCompatActivity() {
         machineData?.let {
             p_time.text = it.totalTime.toString()
             p_count.text = it.totalPushBackCount.toString()
-            p_temp.text = it.latestTemperature.toString()
+            p_temp.text = it.latestTemperature
             p_vibration.text = it.latestVibration
             p_oil_level.text = it.latestOilLevel
             p_bobbin_thread.text = it.latestThreadPercent.toString()

@@ -395,15 +395,13 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
         val temperatureList = mutableListOf<Pair<String, Int>>()
         val db = readableDatabase
         val query = """
-        SELECT dateAndTime, $COL_TEMPERATURE 
-        FROM $TABLE_NAME 
-        WHERE (dateAndTime, rowid) IN (
-            SELECT MAX(dateAndTime), MAX(rowid)
-            FROM $TABLE_NAME 
-            WHERE dateAndTime BETWEEN ? AND ?
-            GROUP BY strftime('%Y-%m-%d %H', dateAndTime)
-        )
-        ORDER BY dateAndTime;
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', dateAndTime) AS hour_start,
+            AVG($COL_TEMPERATURE) AS total_production_count
+        FROM $TABLE_NAME
+        WHERE dateAndTime BETWEEN ? AND ?
+        GROUP BY strftime('%Y-%m-%d %H', dateAndTime)
+        ORDER BY hour_start;
     """
 
         try {
@@ -788,18 +786,243 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
         return stitchCountPerInchList
     }
 
+    fun productionTimeGraphToday(): List<Pair<String, Int>> {
+        val productionTimeList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', $COL_DATE_AND_TIME) AS hour_start,
+            SUM($COL_TIME) AS total_production_time
+        FROM $TABLE_NAME
+        WHERE DATE($COL_DATE_AND_TIME) = DATE('now')
+        GROUP BY strftime('%Y-%m-%d %H', $COL_DATE_AND_TIME)
+        ORDER BY hour_start;
+    """
 
+        try {
+            val cursor = db.rawQuery(query, null)
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // "YYYY-MM-DD HH:00:00"
+                val totalProductionTime = cursor.getInt(1)
+                productionTimeList.add(Pair(hourStart, totalProductionTime))
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
 
+        return productionTimeList
+    }
+    fun productionCountGraphToday(): List<Pair<String, Int>> {
+        val productionTimeList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', $COL_DATE_AND_TIME) AS hour_start,
+            SUM($COL_PUSH_BACK_COUNT) AS total_production_time
+        FROM $TABLE_NAME
+        WHERE DATE($COL_DATE_AND_TIME) = DATE('now')
+        GROUP BY strftime('%Y-%m-%d %H', $COL_DATE_AND_TIME)
+        ORDER BY hour_start;
+    """
 
+        try {
+            val cursor = db.rawQuery(query, null)
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // "YYYY-MM-DD HH:00:00"
+                val totalProductionTime = cursor.getInt(1)
+                productionTimeList.add(Pair(hourStart, totalProductionTime))
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
 
+        return productionTimeList
+    }
+    fun stitchCountGraphToday(): List<Pair<String, Int>> {
+        val productionTimeList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', $COL_DATE_AND_TIME) AS hour_start,
+            SUM($COL_STITCH_COUNT) AS total_production_time
+        FROM $TABLE_NAME
+        WHERE DATE($COL_DATE_AND_TIME) = DATE('now')
+        GROUP BY strftime('%Y-%m-%d %H', $COL_DATE_AND_TIME)
+        ORDER BY hour_start;
+    """
 
+        try {
+            val cursor = db.rawQuery(query, null)
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // "YYYY-MM-DD HH:00:00"
+                val totalProductionTime = cursor.getInt(1)
+                productionTimeList.add(Pair(hourStart, totalProductionTime))
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
 
+        return productionTimeList
+    }
 
+    fun tempGraphToday(): List<Pair<String, Int>> {
+        val productionTimeList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', $COL_DATE_AND_TIME) AS hour_start,
+            AVG($COL_TEMPERATURE) AS total_production_time
+        FROM $TABLE_NAME
+        WHERE DATE($COL_DATE_AND_TIME) = DATE('now')
+        GROUP BY strftime('%Y-%m-%d %H', $COL_DATE_AND_TIME)
+        ORDER BY hour_start;
+    """
 
+        try {
+            val cursor = db.rawQuery(query, null)
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // "YYYY-MM-DD HH:00:00"
+                val totalProductionTime = cursor.getInt(1)
+                productionTimeList.add(Pair(hourStart, totalProductionTime))
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
 
+        return productionTimeList
+    }
+    fun vibrationGraphToday(): List<Pair<String, Int>> {
+        val productionTimeList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', $COL_DATE_AND_TIME) AS hour_start,
+            AVG($COL_VIBRATION) AS total_production_time
+        FROM $TABLE_NAME
+        WHERE DATE($COL_DATE_AND_TIME) = DATE('now')
+        GROUP BY strftime('%Y-%m-%d %H', $COL_DATE_AND_TIME)
+        ORDER BY hour_start;
+    """
 
+        try {
+            val cursor = db.rawQuery(query, null)
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // "YYYY-MM-DD HH:00:00"
+                val totalProductionTime = cursor.getInt(1)
+                productionTimeList.add(Pair(hourStart, totalProductionTime))
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
 
+        return productionTimeList
+    }
+    fun oilLevelGraphToday(): List<Pair<String, Int>> {
+        val productionTimeList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', $COL_DATE_AND_TIME) AS hour_start,
+            AVG($COL_OIL_LEVEL) AS total_production_time
+        FROM $TABLE_NAME
+        WHERE DATE($COL_DATE_AND_TIME) = DATE('now')
+        GROUP BY strftime('%Y-%m-%d %H', $COL_DATE_AND_TIME)
+        ORDER BY hour_start;
+    """
 
+        try {
+            val cursor = db.rawQuery(query, null)
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // "YYYY-MM-DD HH:00:00"
+                val totalProductionTime = cursor.getInt(1)
+                productionTimeList.add(Pair(hourStart, totalProductionTime))
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
+
+        return productionTimeList
+    }
+    fun bobbinThreadGraphToday(): List<Pair<String, Int>> {
+        val productionTimeList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', $COL_DATE_AND_TIME) AS hour_start,
+            SUM($COL_THREAD_PERCENT*2.54) AS total_production_time
+        FROM $TABLE_NAME
+        WHERE DATE($COL_DATE_AND_TIME) = DATE('now')
+        GROUP BY strftime('%Y-%m-%d %H', $COL_DATE_AND_TIME)
+        ORDER BY hour_start;
+    """
+
+        try {
+            val cursor = db.rawQuery(query, null)
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // "YYYY-MM-DD HH:00:00"
+                val totalProductionTime = cursor.getInt(1)
+                productionTimeList.add(Pair(hourStart, totalProductionTime))
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
+
+        return productionTimeList
+    }
+    fun stitchPerInchGraphToday(): List<Pair<String, Int>> {
+        val productionTimeList = mutableListOf<Pair<String, Int>>()
+        val db = readableDatabase
+        val query = """
+        SELECT 
+            strftime('%Y-%m-%d %H:00:00', $COL_DATE_AND_TIME) AS hour_start,
+             SUM(CASE 
+                    WHEN $COL_THREAD_PERCENT > 0 
+                    THEN CAST($COL_STITCH_COUNT AS FLOAT) / $COL_THREAD_PERCENT 
+                    ELSE 0 
+                END) AS total_stitch_per_inch
+        FROM $TABLE_NAME
+        WHERE DATE($COL_DATE_AND_TIME) = DATE('now')
+        GROUP BY strftime('%Y-%m-%d %H', $COL_DATE_AND_TIME)
+        ORDER BY hour_start;
+    """
+
+        try {
+            val cursor = db.rawQuery(query, null)
+            while (cursor.moveToNext()) {
+                val hourStart = cursor.getString(0) // "YYYY-MM-DD HH:00:00"
+                val totalProductionTime = cursor.getInt(1)
+                productionTimeList.add(Pair(hourStart, totalProductionTime))
+            }
+            cursor.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            db.close()
+        }
+
+        return productionTimeList
+    }
 
 }
 

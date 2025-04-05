@@ -372,13 +372,19 @@ class HistoricDataShowing : AppCompatActivity() {
             private val textView: TextView = findViewById(R.id.markerText)
 
             override fun refreshContent(e: Entry?, highlight: Highlight?) {
-                textView.text = "Value: ${e?.y?.toInt()}" // Show value on touch
+                e?.y?.let { value ->
+                    val displayValue = if (value == value.toInt().toFloat()) {
+                        value.toInt().toString()
+                    } else {
+                        String.format("%.2f", value)
+                    }
+                    textView.text = "Value: $displayValue"
+                }
                 super.refreshContent(e, highlight)
             }
         }
 
-        barChart.marker = markerView // Attach marker view
-
+        barChart.marker = markerView
         dialog.show()
     }
 

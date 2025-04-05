@@ -162,7 +162,6 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
         return machineData
     }
 
-
     fun resetMachineData() {
         val db = writableDatabase
 
@@ -261,6 +260,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
         return machineData
     }
 
+    //today data show
+
     fun productionTimeGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
         val productionTimeList = mutableListOf<Pair<String, Int>>()
         val db = readableDatabase
@@ -292,7 +293,6 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         return productionTimeList
     }
-
     fun productionCountGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
         val productionCountList = mutableListOf<Pair<String, Int>>()
         val db = readableDatabase
@@ -324,7 +324,6 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         return productionCountList
     }
-
     fun stitchCountGraph(startDate:String,endDate:String):List<Pair<String, Int>>{
         val stitchCountList = mutableListOf<Pair<String, Int>>()
         val db = readableDatabase
@@ -357,9 +356,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
         return stitchCountList
 
     }
-
-    fun oilLevelGraph(startDate:String,endDate:String):List<Pair<String, Int>>{
-        val oilLevelList = mutableListOf<Pair<String, Int>>()
+    fun oilLevelGraph(startDate:String,endDate:String):List<Pair<String, Float>>{
+        val oilLevelList = mutableListOf<Pair<String, Float>>()
         val db = readableDatabase
         val query = """
         SELECT 
@@ -375,7 +373,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
             while (cursor.moveToNext()) {
                 val hourStart = cursor.getString(0) // First column: hour_start
-                val totalProductionCount = cursor.getInt(1) // Second column: total_production_count
+                val totalProductionCount = cursor.getFloat(1) // Second column: total_production_count
                 oilLevelList.add(Pair(hourStart, totalProductionCount))
             }
             cursor.close()
@@ -390,9 +388,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
         return oilLevelList
 
     }
-
-    fun temperatureGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
-        val temperatureList = mutableListOf<Pair<String, Int>>()
+    fun temperatureGraph(startDate: String, endDate: String): List<Pair<String, Float>> {
+        val temperatureList = mutableListOf<Pair<String, Float>>()
         val db = readableDatabase
         val query = """
         SELECT 
@@ -408,7 +405,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
             while (cursor.moveToNext()) {
                 val hourStart = cursor.getString(0) // First column: latest timestamp per hour
-                val latestTemperature = cursor.getInt(1) // Second column: latest temperature value
+                val latestTemperature = cursor.getFloat(1) // Second column: latest temperature value
                 temperatureList.add(Pair(hourStart, latestTemperature))
             }
             cursor.close()
@@ -422,10 +419,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         return temperatureList
     }
-
-
-    fun vibrationGraph(startDate:String,endDate:String):List<Pair<String, Int>>{
-        val vibrationList = mutableListOf<Pair<String, Int>>()
+    fun vibrationGraph(startDate:String,endDate:String):List<Pair<String, Float>>{
+        val vibrationList = mutableListOf<Pair<String, Float>>()
         val db = readableDatabase
         val query = """
         SELECT 
@@ -441,7 +436,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
             while (cursor.moveToNext()) {
                 val hourStart = cursor.getString(0) // First column: hour_start
-                val totalProductionCount = cursor.getInt(1) // Second column: total_production_count
+                val totalProductionCount = cursor.getFloat(1) // Second column: total_production_count
                 vibrationList.add(Pair(hourStart, totalProductionCount))
             }
             cursor.close()
@@ -456,9 +451,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
         return vibrationList
 
     }
-
-    fun bobbinThreadGraph(startDate:String,endDate:String):List<Pair<String, Int>>{
-        val bobbinThreadList = mutableListOf<Pair<String, Int>>()
+    fun bobbinThreadGraph(startDate:String,endDate:String):List<Pair<String, Float>>{
+        val bobbinThreadList = mutableListOf<Pair<String, Float>>()
         val db = readableDatabase
         val query = """
         SELECT 
@@ -474,7 +468,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
             while (cursor.moveToNext()) {
                 val hourStart = cursor.getString(0) // First column: hour_start
-                val totalProductionCount = cursor.getInt(1) // Second column: total_production_count
+                val totalProductionCount = cursor.getFloat(1) // Second column: total_production_count
                 bobbinThreadList.add(Pair(hourStart, totalProductionCount))
             }
             cursor.close()
@@ -489,9 +483,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
         return bobbinThreadList
 
     }
-
-    fun stitchPerInchGraph(startDate: String, endDate: String): List<Pair<String, Float>> {
-        val stitchPerInchList = mutableListOf<Pair<String, Float>>()
+    fun stitchPerInchGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
+        val stitchPerInchList = mutableListOf<Pair<String, Int>>()
         val db = readableDatabase
         val query = """
         SELECT 
@@ -511,7 +504,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
             while (cursor.moveToNext()) {
                 val hourStart = cursor.getString(0) // First column: hour_start
-                val totalStitchPerInch = cursor.getFloat(1) // Second column: total_stitch_per_inch
+                val totalStitchPerInch = cursor.getInt(1) // Second column: total_stitch_per_inch
                 stitchPerInchList.add(Pair(hourStart, totalStitchPerInch))
             }
             cursor.close()
@@ -526,6 +519,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
         return stitchPerInchList
     }
 
+
+    //set range graph shown
     fun productionTimeForSetRangeGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
         val productionTimeList = mutableListOf<Pair<String, Int>>()
         val db = readableDatabase
@@ -588,7 +583,6 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         return productionCountList
     }
-
     fun stitchCountForSetRangeGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
         val stitchCountList = mutableListOf<Pair<String, Int>>()
         val db = readableDatabase
@@ -620,9 +614,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         return stitchCountList
     }
-
-    fun oilLevelForSetRangeGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
-        val oilLevelList = mutableListOf<Pair<String, Int>>()
+    fun oilLevelForSetRangeGraph(startDate: String, endDate: String): List<Pair<String, Float>> {
+        val oilLevelList = mutableListOf<Pair<String, Float>>()
         val db = readableDatabase
         val query = """
         SELECT 
@@ -638,7 +631,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
             while (cursor.moveToNext()) {
                 val dayStart = cursor.getString(0) // First column: day_start (date only)
-                val totalProductionCount = cursor.getInt(1) // Second column: total_production_count
+                val totalProductionCount = cursor.getFloat(1) // Second column: total_production_count
                 oilLevelList.add(Pair(dayStart, totalProductionCount))
             }
             cursor.close()
@@ -652,9 +645,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         return oilLevelList
     }
-
-    fun temperatureForSetRangeGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
-        val tempList = mutableListOf<Pair<String, Int>>()
+    fun temperatureForSetRangeGraph(startDate: String, endDate: String): List<Pair<String, Float>> {
+        val tempList = mutableListOf<Pair<String, Float>>()
         val db = readableDatabase
         val query = """
         SELECT 
@@ -670,7 +662,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
             while (cursor.moveToNext()) {
                 val dayStart = cursor.getString(0) // First column: day_start (date only)
-                val totalProductionCount = cursor.getInt(1) // Second column: total_production_count
+                val totalProductionCount = cursor.getFloat(1) // Second column: total_production_count
                 tempList.add(Pair(dayStart, totalProductionCount))
             }
             cursor.close()
@@ -684,9 +676,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         return tempList
     }
-
-    fun vibrationForSetRangeGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
-        val vibList = mutableListOf<Pair<String, Int>>()
+    fun vibrationForSetRangeGraph(startDate: String, endDate: String): List<Pair<String, Float>> {
+        val vibList = mutableListOf<Pair<String, Float>>()
         val db = readableDatabase
         val query = """
         SELECT 
@@ -702,7 +693,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
             while (cursor.moveToNext()) {
                 val dayStart = cursor.getString(0) // First column: day_start (date only)
-                val totalProductionCount = cursor.getInt(1) // Second column: total_production_count
+                val totalProductionCount = cursor.getFloat(1) // Second column: total_production_count
                 vibList.add(Pair(dayStart, totalProductionCount))
             }
             cursor.close()
@@ -716,10 +707,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         return vibList
     }
-
-
-    fun bobbinThreadForSetRangeGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
-        val bobbinThreadList = mutableListOf<Pair<String, Int>>()
+    fun bobbinThreadForSetRangeGraph(startDate: String, endDate: String): List<Pair<String, Float>> {
+        val bobbinThreadList = mutableListOf<Pair<String, Float>>()
         val db = readableDatabase
         val query = """
         SELECT 
@@ -735,7 +724,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             val cursor = db.rawQuery(query, arrayOf(startDate, endDate))
             while (cursor.moveToNext()) {
                 val dayStart = cursor.getString(0) // First column: day_start (date only)
-                val totalProductionCount = cursor.getInt(1) // Second column: total_production_count
+                val totalProductionCount = cursor.getFloat(1) // Second column: total_production_count
                 bobbinThreadList.add(Pair(dayStart, totalProductionCount))
             }
             cursor.close()
@@ -749,7 +738,6 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         return bobbinThreadList
     }
-
     fun stitchCountPerInchForSetRangeGraph(startDate: String, endDate: String): List<Pair<String, Int>> {
         val stitchCountPerInchList = mutableListOf<Pair<String, Int>>()
         val db = readableDatabase
@@ -786,6 +774,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
         return stitchCountPerInchList
     }
 
+
+    //real time graph shown query
     fun productionTimeGraphToday(): List<Pair<String, Int>> {
         val productionTimeList = mutableListOf<Pair<String, Int>>()
         val db = readableDatabase
@@ -874,8 +864,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
         return productionTimeList
     }
 
-    fun tempGraphToday(): List<Pair<String, Int>> {
-        val productionTimeList = mutableListOf<Pair<String, Int>>()
+    fun tempGraphToday(): List<Pair<String, Float>> {
+        val productionTimeList = mutableListOf<Pair<String, Float>>()
         val db = readableDatabase
         val query = """
         SELECT 
@@ -891,7 +881,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             val cursor = db.rawQuery(query, null)
             while (cursor.moveToNext()) {
                 val hourStart = cursor.getString(0) // "YYYY-MM-DD HH:00:00"
-                val totalProductionTime = cursor.getInt(1)
+                val totalProductionTime = cursor.getFloat(1)
                 productionTimeList.add(Pair(hourStart, totalProductionTime))
             }
             cursor.close()
@@ -903,8 +893,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         return productionTimeList
     }
-    fun vibrationGraphToday(): List<Pair<String, Int>> {
-        val productionTimeList = mutableListOf<Pair<String, Int>>()
+    fun vibrationGraphToday(): List<Pair<String, Float>> {
+        val productionTimeList = mutableListOf<Pair<String, Float>>()
         val db = readableDatabase
         val query = """
         SELECT 
@@ -920,7 +910,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             val cursor = db.rawQuery(query, null)
             while (cursor.moveToNext()) {
                 val hourStart = cursor.getString(0) // "YYYY-MM-DD HH:00:00"
-                val totalProductionTime = cursor.getInt(1)
+                val totalProductionTime = cursor.getFloat(1)
                 productionTimeList.add(Pair(hourStart, totalProductionTime))
             }
             cursor.close()
@@ -932,8 +922,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         return productionTimeList
     }
-    fun oilLevelGraphToday(): List<Pair<String, Int>> {
-        val productionTimeList = mutableListOf<Pair<String, Int>>()
+    fun oilLevelGraphToday(): List<Pair<String, Float>> {
+        val productionTimeList = mutableListOf<Pair<String, Float>>()
         val db = readableDatabase
         val query = """
         SELECT 
@@ -949,7 +939,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             val cursor = db.rawQuery(query, null)
             while (cursor.moveToNext()) {
                 val hourStart = cursor.getString(0) // "YYYY-MM-DD HH:00:00"
-                val totalProductionTime = cursor.getInt(1)
+                val totalProductionTime = cursor.getFloat(1)
                 productionTimeList.add(Pair(hourStart, totalProductionTime))
             }
             cursor.close()
@@ -961,8 +951,8 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
 
         return productionTimeList
     }
-    fun bobbinThreadGraphToday(): List<Pair<String, Int>> {
-        val productionTimeList = mutableListOf<Pair<String, Int>>()
+    fun bobbinThreadGraphToday(): List<Pair<String, Float>> {
+        val productionTimeList = mutableListOf<Pair<String, Float>>()
         val db = readableDatabase
         val query = """
         SELECT 
@@ -978,7 +968,7 @@ class DbHelper (private val context: Context) : SQLiteOpenHelper(context, DATABA
             val cursor = db.rawQuery(query, null)
             while (cursor.moveToNext()) {
                 val hourStart = cursor.getString(0) // "YYYY-MM-DD HH:00:00"
-                val totalProductionTime = cursor.getInt(1)
+                val totalProductionTime = cursor.getFloat(1)
                 productionTimeList.add(Pair(hourStart, totalProductionTime))
             }
             cursor.close()

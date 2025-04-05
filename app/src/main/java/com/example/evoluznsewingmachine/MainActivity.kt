@@ -125,37 +125,37 @@ class MainActivity : AppCompatActivity() {
         }
         productionCountCardView.setOnClickListener {
             val productionCount=dbHelper.productionCountGraphToday()
-            showGraphDialog("Production Time Graph",productionCount)
+            showGraphDialog("Production Count Graph",productionCount)
 
         }
         oilLevelCardView.setOnClickListener {
             val oilLevelList=dbHelper.oilLevelGraphToday()
-            showGraphDialog("Production Time Graph",oilLevelList)
+            showGraphDialog("Oil Level Graph",oilLevelList)
 
         }
         stitchCountCardView.setOnClickListener {
             val stitchCountList=dbHelper.stitchCountGraphToday()
-            showGraphDialog("Production Time Graph",stitchCountList)
+            showGraphDialog("Stitch Count  Graph",stitchCountList)
 
         }
         tempCardView.setOnClickListener {
             val temperatureList=dbHelper.tempGraphToday()
-            showGraphDialog("Production Time Graph",temperatureList)
+            showGraphDialog("Temperature  Graph",temperatureList)
 
         }
         vibrationCardView.setOnClickListener {
             val vibrationList=dbHelper.vibrationGraphToday()
-            showGraphDialog("Production Time Graph",vibrationList)
+            showGraphDialog("Vibration Graph",vibrationList)
 
         }
         bobbinThreadCardView.setOnClickListener {
             val bobbinThreadList=dbHelper.bobbinThreadGraphToday()
-            showGraphDialog("Production Time Graph",bobbinThreadList)
+            showGraphDialog("Bobbin Thread Graph",bobbinThreadList)
 
         }
         stitchPerInchCardView.setOnClickListener {
               val stitchPerInchList=dbHelper.stitchPerInchGraphToday()
-            showGraphDialog("Production Time Graph",stitchPerInchList)
+            showGraphDialog("Stitch Per Inch  Graph",stitchPerInchList)
         }
 
         fileSavedBtn.setOnClickListener {
@@ -326,7 +326,7 @@ class MainActivity : AppCompatActivity() {
 
         // Setup Bar Chart Data
         val dataSet = BarDataSet(entries, "Production Time").apply {
-            color = Color.BLUE
+            color = Color.RED
             setDrawValues(false)  // Hide values above bars
         }
 
@@ -383,16 +383,25 @@ class MainActivity : AppCompatActivity() {
         barChart.animateY(1000, Easing.EaseInOutQuad)
 
         // Custom marker view to show values on touch
+        // Custom marker view to show values on touch
         val markerView = object : MarkerView(this, R.layout.custom_mark_view) {
             private val textView: TextView = findViewById(R.id.markerText)
 
             override fun refreshContent(e: Entry?, highlight: Highlight?) {
-                textView.text = "Value: ${e?.y?.toInt()}" // Show value on touch
+                e?.y?.let { value ->
+                    val displayValue = if (value == value.toInt().toFloat()) {
+                        value.toInt().toString()
+                    } else {
+                        String.format("%.2f", value)
+                    }
+                    textView.text = "Value: $displayValue"
+                }
                 super.refreshContent(e, highlight)
             }
         }
 
-        barChart.marker = markerView // Attach marker view
+        barChart.marker = markerView
+
 
         dialog.show()
     }

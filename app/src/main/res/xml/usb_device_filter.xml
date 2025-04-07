@@ -1,6 +1,8 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <usb-device>
-        <vendor-id>9025</vendor-id>
+        <usb-device vendor-id="9025"
+            product-id="67"
+            protocol="0"/>
 
     </usb-device>
 

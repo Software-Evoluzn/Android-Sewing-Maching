@@ -13,7 +13,7 @@ class BootReceiver : BroadcastReceiver() {
             context?.let {
                 Handler(Looper.getMainLooper()).postDelayed({
                         startUsbService(it)
-                    }, 5000) // Delay 10 seconds to allow system boot stabilization
+                    }, 1000) // Delay 1 seconds to allow system boot stabilization
 
             }
         }

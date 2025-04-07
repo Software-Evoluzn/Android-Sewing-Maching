@@ -45,27 +45,27 @@ import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var time:TextView
-    lateinit var pushBackCount:TextView
-    lateinit var temperature:TextView
-    lateinit var vibrationValue:TextView
-    lateinit var finalOilLevel:TextView
-    lateinit var threadPercent:TextView
-    lateinit var stitchCount:TextView
-    lateinit var threadConsumption:TextView
-    lateinit var resetBtn:AppCompatButton
+    private lateinit var time:TextView
+    private lateinit var pushBackCount:TextView
+    private lateinit var temperature:TextView
+    private lateinit var vibrationValue:TextView
+    private lateinit var finalOilLevel:TextView
+    private lateinit var threadPercent:TextView
+    private lateinit var stitchCount:TextView
+    private lateinit var threadConsumption:TextView
+    private lateinit var resetBtn:AppCompatButton
     private lateinit var fileSavedBtn:ImageButton
-    lateinit var nextBtn:AppCompatButton
-    lateinit var dbHelper:DbHelper
+    private lateinit var nextBtn:AppCompatButton
+    private lateinit var dbHelper:DbHelper
     private val usbDataViewModel: UsbDataViewModel by viewModels()
-    lateinit var productionTimeCardView:CardView
-    lateinit var productionCountCardView:CardView
-    lateinit var stitchCountCardView:CardView
-    lateinit var tempCardView:CardView
-    lateinit var vibrationCardView:CardView
-    lateinit var oilLevelCardView:CardView
-    lateinit var bobbinThreadCardView:CardView
-    lateinit var stitchPerInchCardView:CardView
+    private lateinit var productionTimeCardView:CardView
+    private lateinit var productionCountCardView:CardView
+    private lateinit var stitchCountCardView:CardView
+    private lateinit var tempCardView:CardView
+    private lateinit var vibrationCardView:CardView
+    private lateinit var oilLevelCardView:CardView
+    private lateinit var bobbinThreadCardView:CardView
+    private lateinit var stitchPerInchCardView:CardView
     private lateinit var barChart: BarChart
     private lateinit var dataSet: BarDataSet
     private var previousValue = 0f

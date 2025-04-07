@@ -75,45 +75,63 @@ class UsbService:Service() {
         }, 5000) // Another delay to ensure device enumeration
     }
 
-    private fun startUsbConnection(){
-        val usbDevices:HashMap<String,UsbDevice>?=usbManager.deviceList
-        if(!usbDevices?.isEmpty()!!){
-            var keep=true
-            usbDevices.forEach{entry->
-                usbDevice=entry.value
-                val deviceVendorId:Int?=usbDevice?.vendorId
-                Log.i("serial", "vendorId:$deviceVendorId")
-                if(deviceVendorId ==9025){
-                    val intent: PendingIntent = PendingIntent.getBroadcast(
-                        this, 0, Intent(ACTION_USB_PERMISSION), 0)
-                    usbManager.requestPermission(usbDevice,intent)
-                    keep=false
-                    Log.i("serial","connection Successful")
-                    Toast.makeText(this,"Connection Successfully", Toast.LENGTH_SHORT).show()
+    private fun startUsbConnection() {
+        val usbDevices: HashMap<String, UsbDevice>? = usbManager.deviceList
+        val sharedPref = getSharedPreferences("USB_PREFS", Context.MODE_PRIVATE)
 
-                }else{
-                    usbConnection=null
-                    usbDevice=null
-                    Log.i("serial","unable to connect")
+        if (!usbDevices.isNullOrEmpty()) {
+            var keep = true
+            usbDevices.forEach { entry ->
+                usbDevice = entry.value
+                val deviceVendorId: Int? = usbDevice?.vendorId
+
+                if (deviceVendorId == 9025) {
+                    val permissionGranted = sharedPref.getBoolean("usb_permission_granted", false)
+
+                    if (permissionGranted) {
+                        // ✅ Auto connect since permission was already granted
+                        usbConnection = usbManager.openDevice(usbDevice)
+                        usbSerial = UsbSerialDevice.createUsbSerialDevice(usbDevice, usbConnection)
+
+                        usbSerial?.let { serial ->
+                            if (serial.open()) {
+                                serial.setBaudRate(9600)
+                                serial.setDataBits(UsbSerialInterface.DATA_BITS_8)
+                                serial.setStopBits(UsbSerialInterface.STOP_BITS_1)
+                                serial.setParity(UsbSerialInterface.PARITY_NONE)
+                                serial.setFlowControl(UsbSerialInterface.FLOW_CONTROL_OFF)
+                                serial.read(usbReadCallback)
+
+                                Log.i("serial", "USB Auto Connected")
+                                Toast.makeText(this, "USB Auto Connected", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+
+                    } else {
+                        // ❌ No permission, ask for it
+                        val intent = PendingIntent.getBroadcast(
+                            this, 0, Intent(ACTION_USB_PERMISSION), 0
+                        )
+                        usbManager.requestPermission(usbDevice, intent)
+                    }
+
+                    keep = false
                 }
-                if(!keep){
-                    return
-                }
+                if (!keep) return
             }
-        }else{
+        } else {
             val usbNotconnectedIntent = Intent("USB_NOT_CONNECTED")
             sendBroadcast(usbNotconnectedIntent)
-
-            Log.i("serial","no usb device connected")
-
+            Log.i("serial", "No USB device connected")
         }
-
     }
+
 
     private val usbReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 ACTION_USB_PERMISSION -> {
+
                     val granted = intent.extras?.getBoolean(UsbManager.EXTRA_PERMISSION_GRANTED)
                     if (granted == true) {
                         usbConnection = usbManager.openDevice(usbDevice)

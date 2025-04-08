@@ -381,14 +381,14 @@ class MainActivity : AppCompatActivity() {
         barChart.legend.isEnabled = false
 
         // Ensure bars are spaced properly
-        barChart.setVisibleXRangeMaximum(12f) // Show only 6 bars at a time
-        barChart.moveViewToX(0f)  // Start from the beginning of the chart
+//        barChart.setVisibleXRangeMaximum(12f) // Show only 6 bars at a time
+//        barChart.moveViewToX(0f)  // Start from the beginning of the chart
 
 
         // Ensure correct scaling to fit all bars
-        barChart.setScaleEnabled(true)  // Allow pinch zooming
-        barChart.setPinchZoom(true)     // Enable smooth zooming
-        barChart.isDragEnabled = true   // Allow horizontal scrolling
+//        barChart.setScaleEnabled(true)  // Allow pinch zooming
+//        barChart.setPinchZoom(true)     // Enable smooth zooming
+//        barChart.isDragEnabled = true   // Allow horizontal scrolling
 
         // Animation for smooth appearance
         barChart.animateY(1000, Easing.EaseInOutQuad)

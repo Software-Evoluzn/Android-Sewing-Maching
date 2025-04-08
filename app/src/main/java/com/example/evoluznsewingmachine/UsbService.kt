@@ -90,7 +90,7 @@ class UsbService:Service() {
                     val permissionGranted = sharedPref.getBoolean("usb_permission_granted", false)
 
                     if (permissionGranted) {
-                        // ✅ Auto connect since permission was already granted
+                        //  Auto connect since permission was already granted
                         usbConnection = usbManager.openDevice(usbDevice)
                         usbSerial = UsbSerialDevice.createUsbSerialDevice(usbDevice, usbConnection)
 
@@ -109,7 +109,7 @@ class UsbService:Service() {
                         }
 
                     } else {
-                        // ❌ No permission, ask for it
+                        //  No permission, ask for it
                         val intent = PendingIntent.getBroadcast(
                             this, 0, Intent(ACTION_USB_PERMISSION), 0
                         )
@@ -166,8 +166,7 @@ class UsbService:Service() {
                     Log.i("USB_SERVICE", "USB device disconnected")
                     Toast.makeText(applicationContext, "USB Device Disconnected", Toast.LENGTH_SHORT).show()
 
-//                     Show dialog box when USB is disconnected
-                    // Send a broadcast to notify the activity
+
                     val usbDisconnectedIntent = Intent("USB_DISCONNECTED")
                     sendBroadcast(usbDisconnectedIntent)
 
@@ -195,11 +194,11 @@ class UsbService:Service() {
                 usbBuffer.append(receivedChunk)
             }
 
-            processUsbBuffer() // ✅ Process data in a separate function to prevent blocking
+            processUsbBuffer() //  Process data in a separate function to prevent blocking
         }
     }
 
-    // ✅ Background thread for message processing
+    //  Background thread for message processing
     private fun processUsbBuffer() {
         CoroutineScope(Dispatchers.IO).launch {
             while (true) {

@@ -38,14 +38,14 @@ class UsbService:Service() {
     private var usbSerial: UsbSerialDevice? = null
     private var usbConnection: UsbDeviceConnection? = null
     private val usbBuffer = StringBuffer()
-    lateinit var dbHelper:DbHelper
+    private lateinit var dbHelper:DbHelper
     private val ACTION_USB_PERMISSION = "permission"
 
     private val handler = Handler(Looper.getMainLooper())
     private var notificationRunnable: Runnable? = null
     private val NOTIFICATION_ID = 1
     private val CHANNEL_ID = "usb_service_channel"
-    lateinit var sharedPref:SharedPreferences
+    private lateinit var sharedPref:SharedPreferences
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -60,7 +60,7 @@ class UsbService:Service() {
         dbHelper = DbHelper(this)
 
 
-          sharedPref= getSharedPreferences("StitchPrefs", Context.MODE_PRIVATE)
+          sharedPref= getSharedPreferences("USB_PREFS", Context.MODE_PRIVATE)
 
         val filter = IntentFilter().apply {
             addAction(ACTION_USB_PERMISSION)
@@ -78,7 +78,7 @@ class UsbService:Service() {
 
     private fun startUsbConnection() {
         val usbDevices: HashMap<String, UsbDevice>? = usbManager.deviceList
-        val sharedPref = getSharedPreferences("USB_PREFS", Context.MODE_PRIVATE)
+         sharedPref = getSharedPreferences("USB_PREFS", Context.MODE_PRIVATE)
 
         if (!usbDevices.isNullOrEmpty()) {
             var keep = true

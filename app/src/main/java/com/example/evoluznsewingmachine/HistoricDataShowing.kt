@@ -58,7 +58,7 @@ class HistoricDataShowing : AppCompatActivity() {
     lateinit var stitchPerInchCardView:CardView
     var isToday:Boolean = false
     lateinit var dbHelpher:DbHelper
-    private val usbDataViewModel: UsbDataViewModel by viewModels()
+
 
 
 
@@ -317,6 +317,9 @@ class HistoricDataShowing : AppCompatActivity() {
 
         val barData = BarData(dataSet).apply {
             barWidth = 0.4f  // Adjust bar width for better alignment
+            barChart.setVisibleXRangeMaximum(24f) // Show all 24 bars
+            barChart.setScaleEnabled(false)       // Disable zooming
+            barChart.isDragEnabled = false        // Disable drag
         }
 
         barChart.data = barData
@@ -345,6 +348,7 @@ class HistoricDataShowing : AppCompatActivity() {
         barChart.axisLeft.apply {
             axisMinimum = 0f // Ensure Y-axis starts from 0
             setDrawGridLines(false)
+
         }
 
         barChart.axisRight.isEnabled = false // Hide right Y-axis

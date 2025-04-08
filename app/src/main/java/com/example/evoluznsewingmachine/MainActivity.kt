@@ -299,15 +299,11 @@ class MainActivity : AppCompatActivity() {
             WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT
         )
-
         val barChart = dialog.findViewById<BarChart>(R.id.productionTimeChart)
         val titleTextView = dialog.findViewById<TextView>(R.id.title)
 
-
         // Set dynamic title
         titleTextView.text = title
-
-
 
         // If no data is available, show a message and return
         if (GraphData.isEmpty()) {
@@ -319,20 +315,19 @@ class MainActivity : AppCompatActivity() {
         val entries = mutableListOf<BarEntry>()
         val hourLabels = mutableListOf<String>()
 
+        // Ensure we collect unique hourly values (fix duplicate hours issue)
+        val hourMap = mutableMapOf<Int, Float>()
 
-            // Ensure we collect unique hourly values (fix duplicate hours issue)
-            val hourMap = mutableMapOf<Int, Float>()
-
-            GraphData.forEach {
+        GraphData.forEach {
                 val hour = it.first.substring(11, 13).toInt()
                 hourMap[hour] = hourMap.getOrDefault(hour, 0f) + it.second.toFloat()
-            }
+        }
 
             // Populate 24-hour range to avoid missing hours
-            for (hour in 0..23) {
+        for (hour in 0..23) {
                 entries.add(BarEntry(hour.toFloat(), hourMap.getOrDefault(hour, 0f)))
                 hourLabels.add(String.format("%02d:00", hour)) // Correct fixed labels
-            }
+        }
 
 
         // Setup Bar Chart Data
@@ -343,6 +338,9 @@ class MainActivity : AppCompatActivity() {
 
         val barData = BarData(dataSet).apply {
             barWidth = 0.4f  // Adjust bar width for better alignment
+            barChart.setVisibleXRangeMaximum(24f) // Show all 24 bars
+            barChart.setScaleEnabled(false)       // Disable zooming
+            barChart.isDragEnabled = false        // Disable drag
         }
 
         barChart.data = barData

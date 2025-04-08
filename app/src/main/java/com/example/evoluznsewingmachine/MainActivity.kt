@@ -1,6 +1,7 @@
 package com.example.evoluznsewingmachine
 
 import android.app.Dialog
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.ContentValues
 import android.content.Context
@@ -8,6 +9,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.hardware.usb.UsbDevice
+import android.hardware.usb.UsbManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -66,6 +69,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var oilLevelCardView:CardView
     private lateinit var bobbinThreadCardView:CardView
     private lateinit var stitchPerInchCardView:CardView
+
+    private val ACTION_USB_PERMISSION = "permission"
     private lateinit var barChart: BarChart
     private lateinit var dataSet: BarDataSet
     private var previousValue = 0f
@@ -118,6 +123,12 @@ class MainActivity : AppCompatActivity() {
         vibrationCardView=findViewById(R.id.Vibration)
         bobbinThreadCardView=findViewById(R.id.bobinThreadLevel)
         stitchPerInchCardView=findViewById(R.id.threadConsumption)
+
+
+
+
+
+
 
         productionTimeCardView.setOnClickListener {
              val productionTimeList=dbHelper.productionTimeGraphToday()

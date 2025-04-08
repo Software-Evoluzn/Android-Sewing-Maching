@@ -26,6 +26,7 @@ import com.felhr.usbserial.UsbSerialDevice
 import com.felhr.usbserial.UsbSerialInterface
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -182,6 +183,9 @@ class UsbService:Service() {
         }
     }
 
+
+
+
     private val usbReadCallback = UsbSerialInterface.UsbReadCallback { data ->
         data?.let {
             val receivedChunk = String(data, Charsets.UTF_8)
@@ -298,6 +302,7 @@ class UsbService:Service() {
     override fun onDestroy() {
         unregisterReceiver(usbReceiver)
         disconnectUsb()
+        coroutineScope.cancel() // 👈 Add this
         super.onDestroy()
     }
 

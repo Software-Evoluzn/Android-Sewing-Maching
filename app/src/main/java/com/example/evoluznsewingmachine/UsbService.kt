@@ -93,7 +93,7 @@ class UsbService:Service() {
                         //  Auto connect since permission was already granted
                         usbConnection = usbManager.openDevice(usbDevice)
                         usbSerial = UsbSerialDevice.createUsbSerialDevice(usbDevice, usbConnection)
-
+                        println(usbSerial)
                         usbSerial?.let { serial ->
                             if (serial.open()) {
                                 serial.setBaudRate(9600)

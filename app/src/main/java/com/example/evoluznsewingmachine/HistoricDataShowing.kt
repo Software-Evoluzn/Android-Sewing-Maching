@@ -58,6 +58,7 @@ class HistoricDataShowing : AppCompatActivity() {
     lateinit var stitchPerInchCardView:CardView
     var isToday:Boolean = false
     lateinit var dbHelpher:DbHelper
+    lateinit var dateShowing:TextView
 
 
 
@@ -89,6 +90,7 @@ class HistoricDataShowing : AppCompatActivity() {
         vibrationCardView=findViewById(R.id.Vibration)
         bobbinThreadCardView=findViewById(R.id.bobinThreadLevel)
         stitchPerInchCardView=findViewById(R.id.threadConsumption)
+        dateShowing=findViewById(R.id.dateShowing)
 
 
         backBtn.setOnClickListener {
@@ -104,19 +106,20 @@ class HistoricDataShowing : AppCompatActivity() {
                 when (menuItem.title) {
                     "Today" -> {
                         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                        setDate.text = today
+                        dateShowing.text = today
                         startDate = today
                         endDate = today
 
                         isToday=true
-                        applyBtn.setOnClickListener {
-                            fetchAndDisplayData(startDate, endDate)  // Fetch immediately
-                        }
+                        fetchAndDisplayData(startDate, endDate)  // Fetch immediately
+//                        applyBtn.setOnClickListener {
+//                            fetchAndDisplayData(startDate, endDate)  // Fetch immediately
+//                        }
 
                     }
                     "Set Range" -> {
                         showDateRangePicker { start, end ->
-                            setDate.text = "$start to $end"
+                            dateShowing.text = "$start to $end"
                             startDate = start
                             endDate = end
                             if(startDate==endDate){
@@ -124,10 +127,10 @@ class HistoricDataShowing : AppCompatActivity() {
                             }else{
                                 isToday=false
                             }
-
-                            applyBtn.setOnClickListener {
-                                fetchAndDisplayData(startDate, endDate)  // Fetch immediately
-                            }
+                            fetchAndDisplayData(startDate, endDate)  // Fetch immediately
+//                            applyBtn.setOnClickListener {
+//                                fetchAndDisplayData(startDate, endDate)  // Fetch immediately
+//                            }
                         }
                     }
                 }
